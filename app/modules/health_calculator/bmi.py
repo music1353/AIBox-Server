@@ -22,3 +22,10 @@ def cal(gender, kg, cm):
     
     return round(bmi, 2)
 
+def result(bmi):
+    if bmi < 18.5:
+        return "過輕"
+    elif 18.5 <= bmi and bmi < 24:
+        return "正常"
+    elif bmi >= 24:
+        return "過重"

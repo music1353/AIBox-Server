@@ -1,10 +1,13 @@
 {
 	"domain": "個人化",
-	"response": [],
+	"response": [
+		""
+	],
 	"concepts": [
 		"個人化",
-		"設定", 
-		"調整"
+		"個人"
 	],
-	"children": []	
+	"children": [
+		""
+	]	
 }

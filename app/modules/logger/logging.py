@@ -17,7 +17,9 @@ class Logging():
     def run(self, log_path=None):
         # set default log_path
         if log_path is None:
-            log_path = self.logger_name+'.log'
+            log_path = self.logger_name + '.log'
+        else:
+            log_path += self.logger_name + '.log'
         
         # create file handler
         fh = logging.FileHandler(log_path)

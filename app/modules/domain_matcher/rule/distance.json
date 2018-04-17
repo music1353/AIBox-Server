@@ -1,11 +1,14 @@
 {
 	"domain": "距離",
-	"response": [],
+	"response": [
+		""
+	],
 	"concepts": [
 		"附近",
-		"周圍", 
-		"遠"
+		"周圍"
 	],
-	"children": []	
+	"children": [
+		""
+	]	
 }
 

@@ -1,87 +1,99 @@
 from app import app
-from config import BASE_DIR
+from config import BASE_DIR, MODEL_DIR, MONGO_URI
 from flask import jsonify, request
-from flask_pymongo import PyMongo
-from app.modules.semantic import math2chin
-from app.modules.health_calculator import bmi
 from app.modules.domain_matcher.matcher import Matcher
+from app.modules.domain_chatbot.chatbot import Chatbot
 import os
-
-mongo = PyMongo(app)
+import pymongo
 
 matcher = Matcher()
 matcher.load_rule_data(os.path.join(BASE_DIR, 'domain_matcher/rule'))
-matcher.load_word2vec_model(os.path.join(os.getcwd(), "app/train_models/word2vec_model/20180309wiki_model.bin"))
+matcher.load_word2vec_model(os.path.join(MODEL_DIR, "20180320all_model.bin"))
 print(matcher.rule_data)
 
-@app.route('/')
-def index():
-    return 'Hello Flask'
+# 連進MongoDB
+client = pymongo.MongoClient(MONGO_URI)
+db = client['aiboxdb']
+print('success connect to mongodb.')
 
-# healthAPI
-@app.route('/api/healthAPI/bmi/<gender>/<kg>/<cm>', methods=['GET'])
-def get_bmi(gender, kg, cm):
-    result_bmi = bmi.cal(gender, kg, cm)
+@app.route('/api/login/', methods=['POST'])
+def login():
+    # 收到的專屬語
+    user_nickname = request.form['user_nickname']
     
-    response = {
-        'status': 200,
-        'msg': '請求成功',
-        'result': result_bmi
-    }
+    # 查看資料庫是否有此專屬語
+    collect = db['users']
+    has_nick_name = collect.find_one({'nickname': user_nickname})
     
-    return jsonify(response)
-
-@app.route('/api/healthAPI/bmi/', methods=['GET'])
-def get_bmi_re():
-    gender = request.args.get('gender')
-    kg = request.args.get('kg')
-    cm = request.args.get('cm')
-    
-    result_bmi = bmi.cal(gender, kg, cm)
-    
-    response = {
-        'status': 200,
-        'msg': '請求成功',
-        'result': result_bmi
-    }
-    
-    return jsonify(response)
-    
-
-@app.route('/api/semanticAPI/<int:math_id>', methods=['GET'])
-def get_math2chin(math_id):
-    chin_id = math2chin.math2ch(math_id)
-    
-    response = {
-        'status': 200,
-        'msg': '請求成功',
-        'result': chin_id
-    }
-    
-    return jsonify(response)
-
-@app.route('/api/goodsAPI/', methods=['GET'])
-def get_goodsList():
-    goods = mongo.db.goods.find()
-    
-    good_list = []
-    for good in goods:
-        good.pop('_id')
-        good_list.append(good)
+    if has_nick_name is None:
+        resp = {
+            'status': 404,
+            'result': '',
+            'msg': '沒有此專屬語'
+        }
         
-    response = {
-        'status': 200,
-        'msg': '請求成功',
-        'result': good_list
-    }
-    return jsonify(response)
+        return jsonify(resp)
+    else:
+        resp = {
+            'status': 200,
+            'result': has_nick_name,
+            'msg': '登入成功'
+        }
+        
+        # 紀錄登入狀況
+        login_collect = db['login']
+        login_collect.update({'_id': 0},{'$set':{'is_login': True, "user_nickname": user_nickname}})
+        
+        return jsonify(resp)
 
-@app.route('/api/domainAPI/', methods=['GET'])
-def get_domain():
-    sentence = request.args.get('sentence')
     
-    domain_score = matcher.match_domain(sentence)
+@app.route('/api/logout/', methods=['POST'])
+def logout():
+    login_collect = db['login']
+    login_collect.update({'_id': 0},{'$set':{'is_login': False, "user_nickname": ''}})
+    
+    resp = {
+        'status': 200,
+        'result': '',
+        'msg': '登出成功'
+    }
+    
+    return jsonify(resp)
+
+
+@app.route('/api/checkLogin/', methods=['POST'])
+def checkLogin():
+    login_collect = db['login']
+    login_doc = login_collect.find_one({'_id': 0})
+    print(login_doc['is_login'])
+    
+    if login_doc['is_login'] is True:
+        return login_doc['user_nickname']
+    else:
+        return 'not login'
+
+    
+@app.route('/api/chatbot/', methods=['POST'])
+def chatbot_resp():
+    # check login
+    login_collect = db['login']
+    login_doc = login_collect.find_one({'_id': 0})
+    if login_doc['is_login'] is True:
+        user_nickname = login_doc['user_nickname']
+    else:
+        user_nickname = ''
+
+    flag = request.form['flag']
+    if flag == '':
+        flag = None
+
+    sentence = request.form['response']
+    print(flag)
+
+    domain_score = matcher.match_domain(sentence, user_nickname=user_nickname, flag=flag)
     print(domain_score)
-    
-    return jsonify(domain_score)
+    chat = Chatbot(domain_score, flag=flag)
+    message = chat.response_word()
+
+    return message
     
