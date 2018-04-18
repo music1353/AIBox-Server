@@ -89,9 +89,32 @@ def chatbot_resp():
 
     sentence = request.form['response']
     print(flag)
-
+    
+    # 分析語意
     domain_score = matcher.match_domain(sentence, user_nickname=user_nickname, flag=flag)
     print(domain_score)
+    
+    # 去db找，是否有此專屬語
+    # 有則登入，無則聽沒
+    try:
+        user_collect = db['users']
+        has_user_nickname_doc = user_collect.find_one({'nickname': sentence})
+        if has_user_nickname_doc is None:
+            print('沒有此nickname逆')
+            pass
+        else:
+            login_collect = db['login']
+            login_collect.update({'_id': 0},{'$set':{'is_login': True, "user_nickname": has_user_nickname_doc['nickname']}})
+
+            resp = {
+                'flag': '',
+                'response': '登入成功'
+            }
+            return jsonify(resp)
+    except:
+        print('list index out of range')
+    
+    # 根據domain_score，做相對應的回覆
     chat = Chatbot(domain_score, flag=flag)
     message = chat.response_word()
 
