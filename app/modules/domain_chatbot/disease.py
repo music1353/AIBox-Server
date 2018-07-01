@@ -31,7 +31,6 @@ class Disease:
         with open(os.path.join(BASE_DIR, 'domain_chatbot/template/disease.json'), 'w', encoding='UTF-8') as output:
             json.dump(self.template, output, indent=4, ensure_ascii=False)
 
-
     # 根據缺少的word，回覆相對應的response
     def response(self):
 

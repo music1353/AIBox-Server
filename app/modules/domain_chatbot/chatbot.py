@@ -1,6 +1,7 @@
 from app.modules.domain_chatbot.user import User
 from app.modules.domain_chatbot.disease import Disease
 from app.modules.domain_chatbot.location import Location
+from app.modules.domain_chatbot.special import Special
 
 class Chatbot:
     # 將domain為'none'的剔除掉，flag為'user_nickname'不需剔除
@@ -29,7 +30,7 @@ class Chatbot:
     # flag -> None or user_done or disease_done or location_done 表示為對話的初開始
     # flag -> user_xxx or disease_xxx or loaction_xxx 表處於哪個模組的回覆流程中
     def response_word(self):
-        if self.flag is None or self.flag == 'user_done' or self.flag == 'disease_done' or  self.flag == 'location_done':
+        if self.flag is None or self.flag == 'user_done' or self.flag == 'disease_done' or self.flag == 'location_done':
             domain = self.choose_domain()
             if domain == 'user':
                 user = User()
@@ -42,6 +43,10 @@ class Chatbot:
             elif domain == 'location':
                 location = Location(word_domain=self.word_domain, flag= 'location_init')
                 return location.response()
+            # 決定為special(domain=none)的流程
+            else:
+                special = Special()
+                return special.response()
         else:
             if 'user' in self.flag:
                 user = User(word_domain=self.word_domain, flag=self.flag)
@@ -58,6 +63,8 @@ class Chatbot:
         isUser = False
         isDisease = False
         isLocation = False
+        isNotDefined = False
+
         for data in self.word_domain:
             if data['domain'] == '個人化' or data['domain'] == '性別':
                 isUser = True
@@ -65,6 +72,8 @@ class Chatbot:
                 isDisease = True
             elif data['domain'] == '地點' or data['domain'] == '數字' or data['domain'] == '城市' or data['domain'] == '距離':
                 isLocation = True
+            elif data['domain'] == []:
+                isNotDefined = True
 
         if isUser:
             return 'user'
@@ -72,3 +81,5 @@ class Chatbot:
             return 'location'
         elif isDisease:
             return 'disease'
+        elif isNotDefined:
+            return 'none'

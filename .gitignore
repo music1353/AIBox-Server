@@ -1,7 +1,5 @@
 train_models/
 __pycache__/
 .DS_Store
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
-Icon
-Icon?
+.idea
+!Icon
