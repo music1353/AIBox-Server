@@ -30,7 +30,35 @@
 
 > Run Server
 
-```
+```bash
 cd AIBox-Server
 python run.py
 ```
+
+
+> Run Client
+
+~~~bash
+cd AIBox-Client
+python client.py
+~~~
+
+~~~python
+# client.py
+import requests
+import json
+
+sentence = input('請公威:')
+response_info = {'flag': '', 'response': sentence}
+message = requests.post("http://127.0.0.1:5000/api/chatbot", json=response_info)
+print(message.text)
+
+while True:
+    dic = json.loads(message.text)
+    flag = dic['flag']
+    sentence = input('請公威:')
+    response_info = {'flag': flag, 'response': sentence}
+    message = requests.post("http://127.0.0.1:5000/api/chatbot", json=response_info)
+    print(message.text)
+~~~
+
