@@ -1,3 +1,6 @@
+import requets
+import json
+
 flag = ''
 sentence = '請問台北市中山路的餐廳'
 response_info = {'flag': flag, 'response': sentence}
