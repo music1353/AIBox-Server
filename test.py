@@ -1,4 +1,4 @@
-import requets
+import requests
 import json
 
 flag = ''
