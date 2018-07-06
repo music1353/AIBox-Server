@@ -2,6 +2,8 @@
 
 > 基於Python Flask所搭建的智慧音箱Server
 
+[![Flask](https://img.shields.io/badge/Flask-0.12.2-blue.svg)](http://flask.pocoo.org/) [![gensim](https://img.shields.io/badge/gensim-3.1.0-blue.svg)](https://radimrehurek.com/gensim/models/word2vec.html) [![gensim](https://img.shields.io/badge/pymongo-3.6.0-blue.svg)](https://api.mongodb.com/python/current/) 
+
 
 
 ## Requirements
