@@ -139,7 +139,6 @@ class User:
         logger = log.Logging('user:store_database')
         logger.run(LOG_DIR)
         try:
-            # url = 'mongodb://aibox:12345@ds231719.mlab.com:31719/aiboxdb'
             client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             collect = db['users']

@@ -1,4 +1,6 @@
 import json
+
+
 class Special:
 
     def response(self):

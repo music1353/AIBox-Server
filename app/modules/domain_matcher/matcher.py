@@ -12,7 +12,7 @@ class Matcher():
     def __init__(self):
         try:
             # set jieba dict
-            jieba_tw.set_dictionary(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/dict.txt.big'))
+            jieba_tw.set_dictionary(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'))
 
             # set stopwords
             self.stopword_set = set()

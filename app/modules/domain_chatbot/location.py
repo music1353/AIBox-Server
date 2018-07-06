@@ -25,8 +25,11 @@ class Location:
                 for data in self.word_domain:
                     if data['domain'] == '地點':
                         self.template['地點'] = data['word']
-                    if data['domain'] == '區域':
+                    if data['domain'] == '城市':
                         self.template['區域'] = data['word']
+                    # 180706, 新增street.json
+                    if data['domain'] == '街道':
+                        self.template['區域'] = self.template['區域'] + data['word']
                     if data['domain'] == '距離':
                         self.template['距離'] = data['word']
                     if data['domain'] == '數字':

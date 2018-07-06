@@ -16,13 +16,34 @@
 
 ## Semantic Recognition Method
 
-1. 從良醫網及健康百科收集語料後，使用Word2Vec訓練模型
+1. 從良醫網及健康百科收集語料 (約有16500篇文章)，使用 Word2Vec 訓練模型
 
-2. 將不同類型的字詞分為不同domain，並將domain內concept的字詞，與使用者斷詞後的字詞丟入模型內判斷相似度
+2. 將不同類型的字詞分為不同 domain，並將 domain 內 concept 的字詞，與使用者斷詞後的字詞丟入模型內判斷相似度。
 
    ![Imgur](https://i.imgur.com/SW76dNc.png)
 
+   
+
+   若字詞沒有在模型內，會產生 KeyError，則會進到我們額外定義好的 domain (直接比對字詞)
+
+   ![Imgur](https://i.imgur.com/4lPjWoM.png)
+
 3. 根據不同字詞的domain，去資料庫找尋合適的回覆語句
+
+
+
+## Recognition Domain
+
+目前有定義 8 種 domain
+
+1. chronic：慢性病
+2. cold：感冒
+3. custom：個人化
+4. city：城市
+5. steet：街道
+6. location：地點
+7. distance：距離
+8. yesno：是非
 
 
 
@@ -38,20 +59,10 @@ python run.py
 
 > Run Client
 
-~~~bash
-cd AIBox-Client
-python client.py
-~~~
-
 ~~~python
 # client.py
 import requests
 import json
-
-sentence = input('請公威:')
-response_info = {'flag': '', 'response': sentence}
-message = requests.post("http://127.0.0.1:5000/api/chatbot", json=response_info)
-print(message.text)
 
 while True:
     dic = json.loads(message.text)
@@ -60,5 +71,10 @@ while True:
     response_info = {'flag': flag, 'response': sentence}
     message = requests.post("http://127.0.0.1:5000/api/chatbot", json=response_info)
     print(message.text)
+~~~
+
+~~~bash
+cd AIBox-Client
+python client.py
 ~~~
 
