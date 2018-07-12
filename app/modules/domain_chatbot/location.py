@@ -30,6 +30,9 @@ class Location:
                     # 180706, 新增street.json
                     if data['domain'] == '街道':
                         self.template['區域'] = self.template['區域'] + data['word']
+                    # 180711, 新增roadsection.json
+                    if data['domain'] == '路段':
+                        self.template['區域'] = self.template['區域'] + data['word']
                     if data['domain'] == '距離':
                         self.template['距離'] = data['word']
                     if data['domain'] == '數字':

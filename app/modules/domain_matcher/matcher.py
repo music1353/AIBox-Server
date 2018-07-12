@@ -91,6 +91,8 @@ class Matcher():
 
                 dic = {'word': word, 'domain': '', 'result': []}
                 threshold = 0.5
+                # 180712, 判斷最大機率的domain
+                max_score = 0
                 predict_domain = 'none'
 
                 for rule in self.rule_data:
@@ -122,9 +124,13 @@ class Matcher():
                         avg_score = 0
                     else:
                         avg_score = score / concept_count
+                        # 180712
+                        if avg_score > max_score:
+                            max_score = avg_score
 
                     dic['result'].append({domain: avg_score})
-                    if avg_score > threshold:
+                    # 180712, 只加入最大的預測score
+                    if avg_score>threshold and avg_score==max_score:
                         predict_domain = domain
                         dic['domain'] = predict_domain
 
@@ -154,6 +160,7 @@ class Matcher():
         return domain_score
 
     def match_custom_key_words(self, word):
+        print(word, '進行custom比對')
         file_data = []
         for filename in os.listdir(os.path.join(BASE_DIR, 'domain_matcher/custom')):
             if fnmatch.fnmatch(filename, '*.json'):

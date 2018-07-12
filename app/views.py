@@ -8,11 +8,13 @@ import os
 import pymongo
 import time
 import threading
+import pprint
 
 matcher = Matcher()
 matcher.load_rule_data(os.path.join(BASE_DIR, 'domain_matcher/rule'))
 matcher.load_word2vec_model(os.path.join(MODEL_DIR, "20180320all_model.bin"))
-print(matcher.rule_data)
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(matcher.rule_data)
 
 # 連進MongoDB
 client = pymongo.MongoClient(MONGO_URI)
@@ -25,13 +27,18 @@ def logout_timeout():
     global times
     print('start logout timeout thread !')
     print('登出倒數', times, '秒')
+    
     while times != 0:
         time.sleep(1)
         times = times - 1
+        
+        if times%10 == 0:
+            print('登出倒數', times, '秒')
+            
         if times == 0:
             try:
-                user_collect = db['users']
-                user_collect.update_many({}, {'$set':{'is_login': False}})
+                login_collect = db['login']
+                login_collect.update_many({'_id': 0}, {'$set':{'is_login': False, "user_nickname": ''}})
                 print('登出成功!')
             except:
                 print('登出錯誤!')
@@ -119,10 +126,17 @@ def chatbot_resp():
 
         # 分析語意
         domain_score = matcher.match_domain(sentence, user_nickname=user_nickname, flag=flag)
-        print(domain_score)
+        pp.pprint(domain_score)
+        
         # 根據domain_score，做相對應的回覆
         chat = Chatbot(domain_score, flag=flag)
         message = chat.response_word()
+        
+        # 若有nickname正在登入，且有繼續在對話，則登出時間延後
+        if login_doc['is_login']==True:
+            global times
+            times = times + 10
+        
         return message
     else:
         login_collect.update({'_id': 0}, {'$set': {'is_login': True, "user_nickname": has_user_nickname_doc['nickname']}})
@@ -134,8 +148,8 @@ def chatbot_resp():
         
         # 登出倒數
         # 是否為登入狀態，並計時倒數
-#        t = threading.Thread(target=logout_timeout, name='logoutTimeoutThread')
-#        t.start()
+        t = threading.Thread(target=logout_timeout, name='logoutTimeoutThread')
+        t.start()
         
         return jsonify(resp)
 
