@@ -88,7 +88,8 @@ class Chatbot:
                 isUser = True
             if data['domain'] == '感冒' or data['domain'] == '慢性病':
                 isDisease = True
-            if data['domain'] == '地點' or data['domain'] == '數字' or data['domain'] == '城市' or data['domain'] == '距離':
+            # 180713 刪除 data['domain']=='數字' & data['domain']=='距離'
+            if data['domain']=='地點' or data['domain'] == '城市':
                 isLocation = True
             if data['domain'] == '提醒':
                 isReminder = True

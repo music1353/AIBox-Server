@@ -90,7 +90,7 @@ class Matcher():
                 err_message = ''
 
                 dic = {'word': word, 'domain': '', 'result': []}
-                threshold = 0.5
+                threshold = 0.6
                 # 180712, 判斷最大機率的domain
                 max_score = 0
                 predict_domain = 'none'
@@ -145,6 +145,10 @@ class Matcher():
                             word, avg_score, domain, predict_domain)
                         logger.debug_msg(fail_msg)
                         print(fail_msg)
+                        
+                # 180713 如果predict_domain還是none, 也去custom搜尋一遍
+                if predict_domain == 'none':
+                    exist_case = True
 
                 if exist_case:
                     predict_domain = self.match_custom_key_words(word)

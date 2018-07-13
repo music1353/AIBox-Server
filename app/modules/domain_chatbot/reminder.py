@@ -5,6 +5,7 @@ import datetime
 import app.modules.logger.logging as log
 from app.modules.domain_chatbot.user import User
 from config import BASE_DIR, LOG_DIR, MONGO_URI
+from app.modules.time_transfer import chin2time
 
 class Reminder:
 
@@ -23,14 +24,20 @@ class Reminder:
         if self.word_domain is not None and self.flag is not None:
             if self.flag == 'reminder_init':
                 for data in self.word_domain:
+                    if data['domain'] == '天':
+                        self.template['天'] = data['word']
                     if data['domain'] == '時段':
                         self.template['時段'] = data['word']
                     if data['domain'] == '時刻':
-                        self.template['時刻'] = data['word']
+                        self.template['時刻'] = self.template['時刻'] + data['word']
                     if data['domain'] == 'none':
                         self.template['事情'] = self.template['事情'] + data['word']
             else:
-                if self.flag == 'reminder_session':
+                if self.flag == 'reminder_day':
+                    for data in self.word_domain:
+                        if data['domain'] == '天':
+                            self.template['時段'] = data['word']
+                elif self.flag == 'reminder_session':
                     for data in self.word_domain:
                         if data['domain'] == '時段':
                             self.template['時段'] = data['word']
@@ -40,9 +47,17 @@ class Reminder:
                             self.template['時刻'] = data['word']
                 elif self.flag == 'reminder_dosomething':
                     for data in self.word_domain:
-                        print('dosome data', data)
+                        print('dosomething:', data)
                         if data['domain'] == 'none':
                             self.template['事情'] = data['word']
+                elif self.flag == 'reminder_dosomething_check':
+                    for data in self.word_domain:
+                        if data['domain']=='是非':
+                            if data['word']=='是' or data['word']=='對' or data['word']=='沒錯':
+                                self.template['事情確認'] = 'true'
+                            else:
+                                self.template['事情'] = ''
+                                self.flag == 'reminder_dosomething'
                             
 
         with open(os.path.join(BASE_DIR, 'domain_chatbot/template/reminder.json'), 'w',encoding='UTF-8') as output:
@@ -52,7 +67,11 @@ class Reminder:
     def response(self):
         content = {}
         
-        if self.template['時段'] =='':
+        if self.template['天'] =='':
+            content['flag'] = 'reminder_day'
+            content['response'] = self.template['天回覆']
+            self.store_conversation(content['response'])
+        elif self.template['時段'] =='':
             content['flag'] = 'reminder_session'
             content['response'] = self.template['時段回覆']
             self.store_conversation(content['response'])
@@ -63,6 +82,10 @@ class Reminder:
         elif self.template['事情'] == '':
             content['flag'] = 'reminder_dosomething'
             content['response'] = self.template['事情回覆']
+            self.store_conversation(content['response'])
+        elif self.template['事情確認'] == 'false':
+            content['flag'] = 'reminder_dosomething_check'
+            content['response'] = self.template['事情確認回覆'] + self.template['事情']
             self.store_conversation(content['response'])
         else:
             content['flag'] = 'reminder_done'
@@ -81,11 +104,26 @@ class Reminder:
             client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             collect = db['reminder']
-
+            
+            # 判斷用戶是否登入，有的話加入user_nickname
+            login_collect = db['login']
+            login_doc = login_collect.find_one({'_id': 0})
+            user_nickname = ''
+            if login_doc['is_login'] == True:
+                user_nickname = login_doc['user_nickname']
+                
+            # 轉換template的資料成date及time
+            today = chin2time.today_date()
+            day = chin2time.day_transfer(self.template['天'])
+            time = chin2time.time_transfer(self.template['時段'], self.template['時刻'])
+            remind_time = today + datetime.timedelta(days=day)
+            remind_time = str(remind_time) + ' ' + time
+            print('提醒時間轉換:', remind_time)
+            
             database_template = {
                 '_id': collect.count() + 1,
-                'session': self.template['時段'],
-                'time': self.template['時刻'],
+                'user_nickname': user_nickname,
+                'remind_time': remind_time,
                 'dosomething': self.template['事情'],
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -96,8 +134,12 @@ class Reminder:
 
     # 清除location.json的欄位內容
     def clean_template(self):
+        
+        self.template['天'] = '今天'
+        self.template['事情確認'] = 'false'
+        
         for key in dict(self.template).keys():
-            if '回覆' not in key and '數字' not in key and '單位' not in key:
+            if '回覆' not in key and '天' not in key and '事情確認' not in key:
                 self.template[key] = ''
 
         with open(os.path.join(BASE_DIR, 'domain_chatbot/template/reminder.json'), 'w', encoding='UTF-8') as output:

@@ -1,8 +1,6 @@
 {
     "domain": "時段",
-    "response": [],
     "concepts": [
         "上午", "下午", "早上", "晚上"
-    ],
-    "children": []
+    ]
 }
