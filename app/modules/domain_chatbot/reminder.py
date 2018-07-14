@@ -25,7 +25,12 @@ class Reminder:
             if self.flag == 'reminder_init':
                 for data in self.word_domain:
                     if data['domain'] == '天':
-                        self.template['天'] = data['word']
+                        day, error = chin2time.weekday_transfer(data['word'])
+                        if error == True:
+                            self.flag = 'reminder_day'
+                            self.template['天'] = ''
+                        else:
+                            self.template['天'] = data['word']
                     if data['domain'] == '時段':
                         self.template['時段'] = data['word']
                     if data['domain'] == '時刻':
@@ -36,7 +41,12 @@ class Reminder:
                 if self.flag == 'reminder_day':
                     for data in self.word_domain:
                         if data['domain'] == '天':
-                            self.template['時段'] = data['word']
+                            day, error = chin2time.weekday_transfer(data['word'])
+                            if error == True:
+                                self.flag = 'reminder_day'
+                                self.template['天'] = ''
+                            else:
+                                self.template['天'] = data['word']
                 elif self.flag == 'reminder_session':
                     for data in self.word_domain:
                         if data['domain'] == '時段':
@@ -113,11 +123,12 @@ class Reminder:
                 user_nickname = login_doc['user_nickname']
                 
             # 轉換template的資料成date及time
-            today = chin2time.today_date()
-            day = chin2time.day_transfer(self.template['天'])
+            if '禮拜' or '星期' in self.template['天']:
+                day, error = chin2time.weekday_transfer(self.template['天'])
+            else:
+                day = chin2time.day_transfer(self.template['天'])
             time = chin2time.time_transfer(self.template['時段'], self.template['時刻'])
-            remind_time = today + datetime.timedelta(days=day)
-            remind_time = str(remind_time) + ' ' + time
+            remind_time = str(day) + ' ' + str(time)
             print('提醒時間轉換:', remind_time)
             
             database_template = {
