@@ -26,7 +26,8 @@ class Reminder:
                 for data in self.word_domain:
                     if data['domain'] == '天':
                         day, error = chin2time.weekday_transfer(data['word'])
-                        if error == True:
+                        print('remi.py:', day, error)
+                        if error==True and day==None:
                             self.flag = 'reminder_day'
                             self.template['天'] = ''
                         else:
@@ -42,7 +43,7 @@ class Reminder:
                     for data in self.word_domain:
                         if data['domain'] == '天':
                             day, error = chin2time.weekday_transfer(data['word'])
-                            if error == True:
+                            if error==True and day==None:
                                 self.flag = 'reminder_day'
                                 self.template['天'] = ''
                             else:

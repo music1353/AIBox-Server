@@ -1,12 +1,11 @@
 import os
 import json
-import app.modules.jieba_tw as jieba_tw
+from app.modules import jieba_tw as jieba_tw
 import app.modules.logger.logging as log
 from config import BASE_DIR, LOG_DIR
 import fnmatch
 from app.modules.domain_chatbot.user import User
 from gensim.models import word2vec
-
 
 class Matcher():
     def __init__(self):

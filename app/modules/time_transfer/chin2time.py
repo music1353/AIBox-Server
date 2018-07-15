@@ -69,9 +69,16 @@ def weekday_transfer(day):
     day = day.replace('星期', '')
     
     # 如果沒有講禮拜"幾"
-    if day == '':
+    if day=='' or '今' in day or '明' in day or '後' in day:
+        print('chin2time error:', day)
         error = True
-        return None, error
+
+        # 今天、明天、後天的情況
+        if day != '':
+            return day, error
+        # 沒收到禮拜幾的情況
+        else:
+            return None, error
     else:
         target_weekday = chinweekday2int(day) - 1 # 目標的禮拜幾
 
