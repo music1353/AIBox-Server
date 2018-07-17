@@ -25,13 +25,30 @@ class Reminder:
             if self.flag == 'reminder_init':
                 for data in self.word_domain:
                     if data['domain'] == '天':
-                        day, error = chin2time.weekday_transfer(data['word'])
-                        print('remi.py:', day, error)
-                        if error==True and day==None:
-                            self.flag = 'reminder_day'
-                            self.template['天'] = ''
+                        # 若有'天'進來，把預設的今天刪除
+                        self.template['天'] = self.template['天'].replace('今天', '')
+
+                        # 若是禮拜幾的格式，檢查是否有缺禮拜"幾"
+                        if '禮拜' in data['word'] or '星期' in data['word']:
+                            print('禮拜流程:', data['word'])
+                            day, error = chin2time.weekday_transfer(data['word'])
+                            if error==True and day==None:
+                                self.flag = 'reminder_day'
+                                self.template['天'] = ''
+                            else:
+                                self.template['天'] = data['word']
+                        elif '月' in data['word'] or '日' in data['word'] or '號' in data['word']:
+                            self.template['天'] = self.template['天'] + data['word']
+
+                            if '月' in self.template['天'] and '日' in self.template['天'] or '月' in self.template['天'] and '號' in self.template['天']:
+                                print('幾月幾日流程:', self.template['天'])
+                                day, error = chin2time.date_transfer(self.template['天'])
+                                if error==True:
+                                    self.flag = 'reminder_day'
+                                    self.template['天'] = ''
                         else:
                             self.template['天'] = data['word']
+                            print('其他流程:', self.template['天'])
                     if data['domain'] == '時段':
                         self.template['時段'] = data['word']
                     if data['domain'] == '時刻':
@@ -42,12 +59,32 @@ class Reminder:
                 if self.flag == 'reminder_day':
                     for data in self.word_domain:
                         if data['domain'] == '天':
-                            day, error = chin2time.weekday_transfer(data['word'])
-                            if error==True and day==None:
-                                self.flag = 'reminder_day'
-                                self.template['天'] = ''
+                            # 若是禮拜幾的格式，檢查是否有缺禮拜"幾"
+                            if '禮拜' in data['word'] or '星期' in data['word']:
+                                print('禮拜流程', data['word'])
+                                day, error = chin2time.weekday_transfer(data['word'])
+                                if error==True and day==None:
+                                    self.flag = 'reminder_day'
+                                    self.template['天'] = ''
+                                else:
+                                    self.template['天'] = data['word']
+                            elif '月' in data['word'] or '日' in data['word'] or '號' in data['word']:
+                                self.template['天'] = self.template['天'] + data['word']
+                                
+                                if '月' in self.template['天'] and '日' in self.template['天']:
+                                    print('幾月幾日流程', self.template['天'])
+                                    day, error = chin2time.date_transfer(self.template['天'])
+                                    if error == True:
+                                        self.flag = 'reminder_day'
+                                        self.template['天'] = ''
                             else:
                                 self.template['天'] = data['word']
+                    if data['domain'] == '時段':
+                        self.template['時段'] = data['word']
+                    if data['domain'] == '時刻':
+                        self.template['時刻'] = self.template['時刻'] + data['word']
+                    if data['domain'] == 'none':
+                        self.template['事情'] = self.template['事情'] + data['word']
                 elif self.flag == 'reminder_session':
                     for data in self.word_domain:
                         if data['domain'] == '時段':
@@ -63,12 +100,11 @@ class Reminder:
                             self.template['事情'] = data['word']
                 elif self.flag == 'reminder_dosomething_check':
                     for data in self.word_domain:
-                        if data['domain']=='是非':
-                            if data['word']=='是' or data['word']=='對' or data['word']=='沒錯':
-                                self.template['事情確認'] = 'true'
-                            else:
-                                self.template['事情'] = ''
-                                self.flag == 'reminder_dosomething'
+                        if data['domain']=='是':
+                            self.template['事情確認'] = 'true'
+                        else:
+                            self.template['事情'] = ''
+                            self.flag = 'reminder_dosomething'
                             
 
         with open(os.path.join(BASE_DIR, 'domain_chatbot/template/reminder.json'), 'w',encoding='UTF-8') as output:
@@ -124,10 +160,13 @@ class Reminder:
                 user_nickname = login_doc['user_nickname']
                 
             # 轉換template的資料成date及time
-            if '禮拜' or '星期' in self.template['天']:
+            if '禮拜' in self.template['天'] or '星期' in self.template['天']:
                 day, error = chin2time.weekday_transfer(self.template['天'])
+            elif '月' in self.template['天'] and '日' in self.template['天'] or '號' in self.template['天']:
+                day, error = chin2time.date_transfer(self.template['天'])
             else:
                 day = chin2time.day_transfer(self.template['天'])
+            
             time = chin2time.time_transfer(self.template['時段'], self.template['時刻'])
             remind_time = str(day) + ' ' + str(time)
             print('提醒時間轉換:', remind_time)

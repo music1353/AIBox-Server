@@ -1,8 +1,12 @@
 from datetime import datetime, date, timedelta
 
-# 傳入中文數字
-# return (int)數字
 def chinweekday2int(chin_weekday):
+    '''中文數字轉阿拉伯數字
+    Args:
+        (string)chin_weekday: 中文數字
+    Returns:
+        (int)阿拉伯數字
+    '''
     if chin_weekday == '一':
         return 1
     elif chin_weekday == '二':
@@ -18,42 +22,51 @@ def chinweekday2int(chin_weekday):
     elif chin_weekday=='日' or chin_weekday=='天':
         return 7
 
-    
-# return (datetime.date) 現在時間，這禮拜天的日期
 def last_date_of_this_week():
+    '''這禮拜天的日期
+    Returns:
+        (datetime.date)這禮拜天的日期
+    '''
     today = date.today()
     last_date = today
     
     count_day = 0
-    while(last_date.weekday()!=6):
-        last_date = today + timedelta(days=1)
+    while(last_date.weekday() != 6):
+        last_date = last_date + timedelta(days=1)
         count_day = count_day + 1
         
     return last_date
 
-
-# 傳入template的 day
-# return (string) 日期
 def day_transfer(day):
+    '''今天、明天等字詞轉為日期
+    Args:
+        (string)template的day
+    Rrturns:
+        (string)日期
+    '''
     today = date.today()
     
     if day == '今天':
         add_day = 0
-        result_day = today + datetime.timedelta(days=add_day)
+        result_day = today + timedelta(days=add_day)
         return str(result_day)
     elif day == '明天':
         add_day = 1
-        result_day = today + datetime.timedelta(days=add_day)
+        result_day = today + timedelta(days=add_day)
         return str(result_day)
     elif day == '後天':
         add_day = 2
-        result_day = today + datetime.timedelta(days=add_day)
+        result_day = today + timedelta(days=add_day)
         return str(result_day)
 
-    
-# 傳入template的 day
-# return (string)日期, (boolean) error
 def weekday_transfer(day):
+    '''這禮拜、下禮拜等字詞轉日期
+    Args:
+        (string)template的day
+    Returns:
+        (string)日期
+        (boolean)error: 若篩選完後還有字詞或是少了禮拜"幾", 則會error=True
+    '''
     error = False # 判斷是否有錯誤
     
     # 計算有幾個'下'
@@ -67,18 +80,13 @@ def weekday_transfer(day):
     day = day.replace('這', '')
     day = day.replace('禮拜', '')
     day = day.replace('星期', '')
-    
-    # 如果沒有講禮拜"幾"
-    if day=='' or '今' in day or '明' in day or '後' in day:
-        print('chin2time error:', day)
-        error = True
 
-        # 今天、明天、後天的情況
-        if day != '':
-            return day, error
-        # 沒收到禮拜幾的情況
-        else:
-            return None, error
+    # 如果沒有講禮拜"幾"
+    # FIXME
+    if day == '':
+        print('weekday_transfer error:', day)
+        error = True
+        return None, error
     else:
         target_weekday = chinweekday2int(day) - 1 # 目標的禮拜幾
 
@@ -96,8 +104,6 @@ def weekday_transfer(day):
                 print('這禮拜', target_weekday+1, '已經過了')
                 error = True
                 return None, error
-
-
         # 下禮拜
         elif count_next == 1:
             last_weekday = last_date_of_this_week()
@@ -105,20 +111,72 @@ def weekday_transfer(day):
             while(next_weekday.weekday() != target_weekday):
                 next_weekday = next_weekday + timedelta(days=1)
             return next_weekday, error
-    
 
-# 傳入template的 session
-# return (int) 0(am) or 12(pm)
+def date_transfer(day):
+    '''中文幾月幾日轉日期格式的日期
+    Args:
+        (string)template的day
+    Returns:
+        (string)日期
+        (boolean)error: 如果沒有此月此日或是日期在今天之前, error==false
+    '''
+    
+    error = False
+    
+    # 處理成[月, 日]格式
+    split_list = day.split('月')
+    date_list = []
+    for item in split_list:
+        item = item.replace('月', '')
+        item = item.replace('日', '')
+        item = item.replace('號', '')
+        date_list.append(item)
+
+    # 檢查是否少了日或月
+    if len(date_list)<2 or date_list[1]=='':
+        error = True
+        return None, error
+        
+    today = datetime.today()
+    year = date.today().year
+    month = date_list[0]
+    day = date_list[1]
+    date_str = str(year)+'/'+str(month)+'/'+str(day)
+
+    # 檢查這月是否有此月此日
+    try:
+        remind_date = datetime.strptime(date_str, '%Y/%m/%d')
+        
+        # 檢查日期是否在今天日期以前
+        if remind_date > today:
+            return str(remind_date.date()), error
+        else:
+            print('date_transfer error')
+            error = True
+            return None, error
+    except Exception as err:
+        error = True
+        return None, error
+
 def session_transfer(session):
+    '''上午、下午等字詞轉進位時間
+    Args:
+        (string)template的session
+    Returns:
+        (int)0 or 12
+    '''
     if session=='上午' or session=='早上':
         return 0
     elif session=='下午' or session=='晚上':
         return 12
     
-    
-# 傳入template的 time
-# return (str)幾點幾分幾秒
 def time_transfer(session, time):
+    '''幾點幾分轉時間
+    Args:
+        (string)template的time
+    Returns:
+        (string)時間格式的 時:分:秒
+    '''
     split_list = []
     hour = ''
     minute = ''

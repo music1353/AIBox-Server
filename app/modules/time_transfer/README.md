@@ -41,6 +41,13 @@ chin2time.**weekday_transfer** (day)
 
 
 
+chin2time.**date_transfer** (day)
+
+* Input：(string) template的day。e.g. 3月15日、4月5號
+* Output：(string) 日期, (boolean) 是否有錯誤 e.g. 這月是否有此月此日、日期是否在今天日期以前
+
+
+
 chin2time.**session_transfer** (session)
 
 - Input：(string) template的session。e.g. 上午、早上、下午、晚上

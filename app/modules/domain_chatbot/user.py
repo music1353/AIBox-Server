@@ -44,11 +44,12 @@ class User:
                         self.template['年紀'] = data['word']
             elif self.flag == 'user_smoke':
                 for data in self.word_domain:
-                    if data['domain'] == '是非':
-                        if data['word'] == '有' or data['word'] == '會' or data['word'] == '沒錯':
-                            self.template['吸菸'] = 'True'
-                        else:
-                            self.template['吸菸'] = 'False'
+                    if data['domain'] == '是':
+                        self.template['吸菸'] = 'True'
+                        break
+                    if data['domain'] == '非':
+                        self.template['吸菸'] = 'False'
+                        break
             elif self.flag == 'user_workout':
                 for data in self.word_domain:
                     if data['domain'] == '數字':
