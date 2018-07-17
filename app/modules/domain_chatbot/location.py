@@ -66,43 +66,6 @@ class Location:
             self.store_database()
             self.clean_template()
             self.store_conversation(content['response'])
-        
-        '''
-        180713 改寫成上面那樣
-        
-        if self.template['地點'] != '':
-            if self.template['距離'] != '':
-                if self.template['距離'] == 'True':
-                    content['flag'] = 'location_done'
-                    content['response'] = self.template['完成回覆']
-                    self.store_database()
-                    self.clean_template()
-                    self.store_conversation(content['response'])
-                elif self.template['區域'] != '':
-                    content['flag'] = 'location_done'
-                    content['response'] = self.template['完成回覆']
-                    self.store_database()
-                    self.clean_template()
-                    self.store_conversation(content['response'])
-                else:
-                    content['flag'] = 'location_region'
-                    content['response'] = self.template['區域回覆']
-                    self.store_conversation(content['response'])
-            elif self.template['區域'] != '':
-                content['flag'] = 'location_done'
-                content['response'] = self.template['完成回覆']
-                self.store_database()
-                self.clean_template()
-                self.store_conversation(content['response'])
-            else:
-                content['flag'] = 'location_distance'
-                content['response'] = self.template['距離回覆']
-                self.store_conversation(content['response'])
-        else:
-            content['flag'] = 'location_get'
-            content['response'] = self.template['地點回覆']
-            self.store_conversation(content['response'])
-        '''
 
         return json.dumps(content, ensure_ascii=False)
 
@@ -119,7 +82,6 @@ class Location:
                 '_id': collect.count() + 1,
                 'location': self.template['地點'],
                 'region': self.template['區域'],
-#                'distance': self.template['距離'],
                 'number': self.template['數字'],
                 'unit': self.template['單位'],
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

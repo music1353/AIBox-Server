@@ -145,14 +145,15 @@ class User:
             collect = db['users']
 
             # 計算bmi、中風機率
-            bmiNum = bmi.cal(gender=self.template['性別'], cm=int(self.template['身高']), kg=int(self.template['體重']))
-            bmiResult = bmi.result(bmiNum)
-            self.template['bmi'] = bmiResult
+            bmi_value = bmi.cal(gender=self.template['性別'], cm=int(self.template['身高']), kg=int(self.template['體重']))
+            bmi_result = bmi.result(bmi_value)
+            self.template['bmi值'] = bmi_value
+            self.template['bmi狀況'] = bmi_result
             score = 0;
             for key, value in dict(self.template).items():
                 if value == 'True':
                     score = score + 1
-            stroke_result = stroke_score.result(score, int(self.template['運動']), self.template['bmi'])
+            stroke_result = stroke_score.result(score, int(self.template['運動']), self.template['bmi狀況'])
             self.template['中風風險'] = stroke_result
 
             database_template = {
@@ -170,7 +171,8 @@ class User:
                     'high_blood': self.template['高血壓'],
                     'high_cholesterol': self.template['高膽固醇'],
                     'diabetes': self.template['糖尿病'],
-                    'bmi': self.template['bmi'],
+                    'bmi_value': str(self.template['bmi值']),
+                    'bmi': self.template['bmi狀況'],
                     'stroke_score': self.template['中風風險']
                 },
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

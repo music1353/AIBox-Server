@@ -19,7 +19,7 @@ pp.pprint(matcher.rule_data)
 # 連進MongoDB
 client = pymongo.MongoClient(MONGO_URI)
 db = client['aiboxdb']
-print('success connect to mongodb.')
+print('chatbot api success connect to mongodb.')
 
 # 登出倒數計時方法
 times = 30 # global倒數var
@@ -42,11 +42,10 @@ def logout_timeout():
                 print('登出成功!')
             except:
                 print('登出錯誤!')
-                
-                
+                  
 
-@app.route('/api/login', methods=['POST'])
-def login():
+@app.route('/api/chatbot/login', methods=['POST'])
+def chatbot_login():
     # 收到的專屬語
     user_nickname = request.json['user_nickname']
     
@@ -56,14 +55,14 @@ def login():
     
     if has_nick_name is None:
         resp = {
-            'status': 404,
+            'status': '404',
             'result': '',
             'msg': '沒有此專屬語'
         }
         return jsonify(resp)
     else:
         resp = {
-            'status': 200,
+            'status': '200',
             'result': has_nick_name,
             'msg': '登入成功'
         }
@@ -74,14 +73,14 @@ def login():
         return jsonify(resp)
 
     
-@app.route('/api/logout', methods=['POST'])
-def logout():
+@app.route('/api/chatbot/logout', methods=['POST'])
+def chatbot_logout():
 
     login_collect = db['login']
     login_collect.update({'_id': 0}, {'$set':{'is_login': False, 'user_nickname': ''}})
     
     resp = {
-        'status': 200,
+        'status': '200',
         'result': '',
         'msg': '登出成功'
     }
@@ -89,8 +88,8 @@ def logout():
     return jsonify(resp)
 
 
-@app.route('/api/checkLogin', methods=['POST'])
-def checkLogin():
+@app.route('/api/chatbot/checkLogin', methods=['POST'])
+def chatbot_check_login():
     login_collect = db['login']
     login_doc = login_collect.find_one({'_id': 0})
     print(login_doc['is_login'])
@@ -102,7 +101,7 @@ def checkLogin():
 
     
 @app.route('/api/chatbot', methods=['POST'])
-def chatbot_resp():
+def chatbot_chatbot_resp():
 
     flag = request.json['flag']
     if flag == '':
