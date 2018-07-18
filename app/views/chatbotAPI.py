@@ -21,9 +21,9 @@ client = pymongo.MongoClient(MONGO_URI)
 db = client['aiboxdb']
 print('chatbot api success connect to mongodb.')
 
-# 登出倒數計時方法
 times = 30 # global倒數var
 def logout_timeout():
+    '''登出倒數計時方法，配合thread使用'''
     global times
     print('start logout timeout thread !')
     print('登出倒數', times, '秒')
@@ -46,6 +46,11 @@ def logout_timeout():
 
 @app.route('/api/chatbot/login', methods=['POST'])
 def chatbot_login():
+    '''音箱端的登入
+    Params:
+        user_nickname: 用戶的專屬語
+    '''
+
     # 收到的專屬語
     user_nickname = request.json['user_nickname']
     
@@ -75,6 +80,7 @@ def chatbot_login():
     
 @app.route('/api/chatbot/logout', methods=['POST'])
 def chatbot_logout():
+    '''音箱端的登出'''
 
     login_collect = db['login']
     login_collect.update({'_id': 0}, {'$set':{'is_login': False, 'user_nickname': ''}})
@@ -90,6 +96,8 @@ def chatbot_logout():
 
 @app.route('/api/chatbot/checkLogin', methods=['POST'])
 def chatbot_check_login():
+    '''音箱端檢查登入狀態'''
+    
     login_collect = db['login']
     login_doc = login_collect.find_one({'_id': 0})
     print(login_doc['is_login'])

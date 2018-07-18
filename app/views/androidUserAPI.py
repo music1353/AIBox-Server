@@ -3,6 +3,7 @@ from config import MONGO_URI
 from flask import session, request, jsonify
 import pymongo
 from app.modules.health_calculator import health
+from datetime import datetime
 
 # 連進MongoDB
 client = pymongo.MongoClient(MONGO_URI)
@@ -25,7 +26,6 @@ def androidUser_login():
         }
     '''
 
-    # user_nickname = request.args.get('user_nickname')
     user_nickname = request.json['user_nickname']
     print('login get user_nickname:', user_nickname)
 
@@ -126,11 +126,12 @@ def androidUser_get_profile():
     
     profile = {
         'nickname': user_doc['nickname'],
-        'gendenr': user_doc['gender'],
+        'gender': user_doc['gender'],
         'age': user_doc['age'],
         'height': user_doc['height'],
         'weight': user_doc['weight'],
-        'bmi_value': user_doc['health']['bmi_value']
+        'bmi_value': user_doc['health']['bmi_value'],
+        'bmi': user_doc['health']['bmi']
     }
 
     resp = {
@@ -172,7 +173,7 @@ def androidUser_get_health():
 
 @app.route('/api/androidUser/getNeedWater')
 def androidUser_get_needwater():
-    '''取的用戶需要攝取的水量(c.c.)
+    '''取得用戶需要攝取的水量(c.c.)
     Returns:
         {
             'status': '200'->取得成功; '404'->取得失敗
@@ -204,7 +205,7 @@ def androidUser_get_needwater():
 
 @app.route('/api/androidUser/getNeedCalorie')
 def androidUser_get_needcalorie():
-    '''取的用戶需要攝取的熱量(c.c.)
+    '''取得用戶需要攝取的熱量(大卡)
     Returns:
         {
             'status': '200'->取得成功; '404'->取得失敗
@@ -237,7 +238,7 @@ def androidUser_get_needcalorie():
 
 @app.route('/api/androidUser/getConversation', methods=['GET'])
 def androidUser_get_conversation():
-    '''取得用戶的對話紀錄
+    '''取得用戶的對話紀錄, 且會過濾掉過期的提醒資料
     Returns:
         {
             'status': '200'->取得成功; '404'->取得失敗
@@ -291,11 +292,12 @@ def androidUser_get_remind():
 
     result_list = []
     for item in user_remind_doc:
-        obj = {
-            'remind_time': item['remind_time'],
-            'dosomething': item['dosomething']
-        }
-        result_list.append(obj)
+        if datetime.strptime(item['remind_time'], '%Y-%m-%d %H:%M:%S') > datetime.today():
+            obj = {
+                'remind_time': item['remind_time'],
+                'dosomething': item['dosomething']
+            }
+            result_list.append(obj)
 
     resp = {
         'status': '200',
