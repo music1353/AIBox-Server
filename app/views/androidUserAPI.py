@@ -41,6 +41,7 @@ def androidUser_login():
         }
         return jsonify(resp)
     else:
+        # 記錄到session
         session['login'] = True
         session['user_nickname'] = user_nickname
 
@@ -65,6 +66,7 @@ def androidUser_logout():
     print('androidUser logout status:', session['login'])
     print('androidUser logout user_nickname:', session['user_nickname'])
 
+    # 刪除session
     session.pop('login', None)
     session.pop('user_nickname', None)
 
@@ -87,11 +89,18 @@ def androidUser_check_login():
     '''
     
     try:
-        if session['login'] == True:
+        if session.get('login') == True:
             resp = {
                 'status': '200',
                 'result': session['user_nickname'],
                 'msg': session['user_nickname']+'登入中'
+            }
+            return jsonify(resp)
+        else:
+            resp = {
+                'status': '404',
+                'result': '',
+                'msg': '未登入'
             }
             return jsonify(resp)
     except Exception as err:
@@ -112,15 +121,16 @@ def androidUser_get_profile():
             'msg': 訊息
         }
     '''
-    try:
-        user_nickname = session['user_nickname']
+    
+    if(session.get('user_nickname') != None):
+        user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
-    except Exception as err:
+    else:
         resp = {
             'status': '404',
-            'result': err,
-            'msg': '取得用戶個人資訊錯誤'
+            'result': '未登入',
+            'msg': '取得用戶需要攝取的水量錯誤'
         }
         return jsonify(resp)
     
@@ -152,15 +162,15 @@ def androidUser_get_health():
         }
     '''
 
-    try:
-        user_nickname = session['user_nickname']
+    if(session.get('user_nickname') != None):
+        user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
-    except Exception as err:
+    else:
         resp = {
             'status': '404',
-            'result': err,
-            'msg': '取得用戶生活習慣錯誤'
+            'result': '未登入',
+            'msg': '取得用戶需要攝取的水量錯誤'
         }
         return jsonify(resp)
 
@@ -171,66 +181,38 @@ def androidUser_get_health():
     }
     return jsonify(resp)
 
-@app.route('/api/androidUser/getNeedWater')
-def androidUser_get_needwater():
-    '''取得用戶需要攝取的水量(c.c.)
+@app.route('/api/androidUser/getNeed')
+def androidUser_get_need():
+    '''取得用戶需要攝取的水量(c.c.)及卡路里(大卡)
     Returns:
         {
             'status': '200'->取得成功; '404'->取得失敗
-            'result': 用戶需要攝取的水量; 錯誤訊息
+            'result': 用戶需要攝取的水量及卡路里; 錯誤訊息
             'msg': 訊息
         }
     '''
 
-    try:
-        user_nickname = session['user_nickname']
+    if(session.get('user_nickname') != None):
+        user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
-    except Exception as err:
+    else:
         resp = {
             'status': '404',
-            'result': err,
+            'result': '未登入',
             'msg': '取得用戶需要攝取的水量錯誤'
         }
         return jsonify(resp)
 
     needwater = health.cal_water(user_doc['weight'])
-    
-    resp = {
-        'status': '200',
-        'result': needwater,
-        'msg': '取得用戶需要攝取的水量成功'
-    }
-    return jsonify(resp)
-
-@app.route('/api/androidUser/getNeedCalorie')
-def androidUser_get_needcalorie():
-    '''取得用戶需要攝取的熱量(大卡)
-    Returns:
-        {
-            'status': '200'->取得成功; '404'->取得失敗
-            'result': 用戶需要攝取的熱量; 錯誤訊息
-            'msg': 訊息
-        }
-    '''
-
-    try:
-        user_nickname = session['user_nickname']
-        collect = db['users']
-        user_doc = collect.find_one({'nickname': user_nickname})
-    except Exception as err:
-        resp = {
-            'status': '404',
-            'result': err,
-            'msg': '取得用戶需要攝取的熱量錯誤'
-        }
-        return jsonify(resp)
-
     needcalorie = health.cal_BMR(user_doc['gender'], user_doc['weight'], user_doc['height'], user_doc['age'])
-    
+
     resp = {
         'status': '200',
-        'result': needcalorie,
+        'result': {
+            'needwater': needwater,
+            'needcalorie': needcalorie
+        },
         'msg': '取得用戶需要攝取的熱量成功'
     }
     return jsonify(resp)
@@ -247,15 +229,15 @@ def androidUser_get_conversation():
         }
     '''
 
-    try:
-        user_nickname = session['user_nickname']
+    if(session.get('user_nickname') != None):
+        user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
-    except Exception as err:
+    else:
         resp = {
             'status': '404',
-            'result': err,
-            'msg': '取得用戶對話紀錄錯誤'
+            'result': '未登入',
+            'msg': '取得用戶需要攝取的水量錯誤'
         }
         return jsonify(resp)
 
@@ -277,13 +259,13 @@ def androidUser_get_remind():
         }
     '''
 
-    try:
-        user_nickname = session['user_nickname']
-    except Exception as err:
+    if(session.get('user_nickname') != None):
+        user_nickname = session.get('user_nickname')
+    else:
         resp = {
             'status': '404',
-            'result': err,
-            'msg': '取得用戶提醒錯誤'
+            'result': '未登入',
+            'msg': '取得用戶需要攝取的水量錯誤'
         }
         return jsonify(resp)
 
@@ -306,6 +288,61 @@ def androidUser_get_remind():
     }
 
     return jsonify(resp)
+
+@app.route('/api/androidUser/concernLock', methods=['POST'])
+def androidUser_concern_lock():
+    '''讓concern模組知道現在是對誰做關心
+    Params:
+        user_nickname: 使用者的專屬語
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': ''
+            'msg': 訊息
+        }
+    '''
+
+    user_nickname = request.json['user_nickname']
+    print('concern lock:', user_nickname)
+
+    # 記錄到db
+    concern_lock_collect = db['concern_lock']
+    concern_lock_collect.update({'_id': 0}, {'$set':{'user_nickname': user_nickname, 'lock': True, 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}})
+    
+    resp = {
+        'status': '200',
+        'result': '',
+        'msg': user_nickname + '進入關心狀態'
+    }
+    return jsonify(resp)
+
+@app.route('/api/androidUser/concernRelease', methods=['POST'])
+def androidUser_concern_release():
+    '''讓concern模組知道現在是對誰解除關心狀態
+    Params:
+        user_nickname: 使用者的專屬語
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': ''
+            'msg': 訊息
+        }
+    '''
+
+    user_nickname = request.json['user_nickname']
+    print('concern release:', user_nickname)
+
+    # 刪除到db登入紀錄
+    concern_lock_collect = db['concern_lock']
+    concern_lock_collect.update({'_id': 0}, {'$set':{'user_nickname': '', 'lock': False, 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}})
+
+    resp = {
+        'status': '200',
+        'result': '',
+        'msg': user_nickname + '退出提醒狀態'
+    }
+    return jsonify(resp)
+
 
     
     

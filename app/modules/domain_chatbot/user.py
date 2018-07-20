@@ -176,9 +176,8 @@ class User:
                     'stroke_score': self.template['中風風險']
                 },
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'conversation':[
-
-                ],
+                'conversation':[],
+                'daily_concern': []
             }
             collect.insert_one(database_template)
             logger.debug_msg('successfully store to database')

@@ -2,6 +2,7 @@ from app.modules.domain_chatbot.user import User
 from app.modules.domain_chatbot.disease import Disease
 from app.modules.domain_chatbot.location import Location
 from app.modules.domain_chatbot.reminder import Reminder
+from app.modules.domain_chatbot.concern import Concern
 from app.modules.domain_chatbot.special import Special
 
 class Chatbot:
@@ -24,16 +25,14 @@ class Chatbot:
                 dic['word'] = domain['word']
                 dic['domain'] = domain['domain']
                 word_domain.append(dic)
-                '''
-                這是原本代碼
+                '''這是原本代碼
                 if domain['domain'] != 'none':
                     dic = {}
                     dic['word'] = domain['word']
                     dic['domain'] = domain['domain']
                     word_domain.append(dic)
                 '''
-                
-
+        
         self.word_domain = word_domain
         self.flag = flag
 
@@ -41,7 +40,8 @@ class Chatbot:
     # flag -> None or user_done or disease_done or location_done 表示完成該模組的回覆流程
     # flag -> user_xxx or disease_xxx or loaction_xxx 表處於哪個模組的回覆流程中
     def response_word(self):
-        if self.flag is None or self.flag=='user_done' or self.flag=='disease_done' or self.flag=='location_done' or self.flag=='reminder_done':
+        # TODO 新增 or concern_done
+        if self.flag is None or self.flag=='user_done' or self.flag=='disease_done' or self.flag=='location_done' or self.flag=='reminder_done' or self.flag=='morning_concern_done' or self.flag=='noon_concern_done':
             domain = self.choose_domain()
             if domain == 'user':
                 user = User()
@@ -58,6 +58,18 @@ class Chatbot:
             elif domain == 'reminder':
                 reminder = Reminder(word_domain=self.word_domain, flag='reminder_init')
                 return reminder.response()
+            # 決定為morningconcern的模組流程
+            elif domain == 'morningconcern':
+                concern = Concern(word_domain=self.word_domain, flag='morning_init')
+                return concern.response()
+            # 決定為noonconcern的模組流程
+            elif domain == 'noonconcern':
+                concern = Concern(word_domain=self.word_domain, flag='noon_init')
+                return concern.response()
+            # 決定為nightconcern的模組流程
+            elif domain == 'nightconcern':
+                concern = Concern(word_domain=self.word_domain, flag='night_init')
+                return concern.response()
             # 決定為special(domain=none)的流程
             else:
                 special = Special()
@@ -75,6 +87,15 @@ class Chatbot:
             elif 'reminder' in self.flag:
                 reminder = Reminder(word_domain=self.word_domain, flag=self.flag)
                 return reminder.response()
+            elif 'morning' in self.flag:
+                concern = Concern(word_domain=self.word_domain, flag=self.flag)
+                return concern.response()
+            elif 'noon' in self.flag:
+                concern = Concern(word_domain=self.word_domain, flag=self.flag)
+                return concern.response()
+            elif 'night' in self.flag:
+                concern = Concern(word_domain=self.word_domain, flag=self.flag)
+                return concern.response()
 
     # 選擇哪個domain模組的回覆流程
     def choose_domain(self):
@@ -82,6 +103,7 @@ class Chatbot:
         isDisease = False
         isLocation = False
         isReminder = False
+        isConcern = '' # 要分是早上、中午或晚上的關心
 
         for data in self.word_domain:
             if data['domain'] == '個人化' or data['domain'] == '性別':
@@ -93,6 +115,8 @@ class Chatbot:
                 isLocation = True
             if data['domain'] == '提醒':
                 isReminder = True
+            if data['domain'] == '關心':
+                isConcern = data['word']
 
         if isUser:
             return 'user'
@@ -102,6 +126,8 @@ class Chatbot:
             return 'location'
         elif isReminder:
             return 'reminder'
+        elif isConcern:
+            return isConcern
         # domain為none的情況
         else:
             return 'none'

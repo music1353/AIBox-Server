@@ -97,7 +97,7 @@ def chatbot_logout():
 @app.route('/api/chatbot/checkLogin', methods=['POST'])
 def chatbot_check_login():
     '''音箱端檢查登入狀態'''
-    
+
     login_collect = db['login']
     login_doc = login_collect.find_one({'_id': 0})
     print(login_doc['is_login'])
@@ -116,7 +116,7 @@ def chatbot_chatbot_resp():
         flag = None
 
     sentence = request.json['response']
-    print(flag)
+    print('flag:', flag)
 
     # 去db找，是否有此專屬語
     # 有則登入，無則聽沒
