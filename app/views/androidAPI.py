@@ -141,52 +141,65 @@ def android_get_weather():
         }
     '''
 
-    try:
-        city = request.args.get('city')
-        print('city:', city)
+    city = request.args.get('city')
+    has_city = False
 
-        # 找到city_id
-        city_id = ''
-        city_resp = requests.get('https://works.ioa.tw/weather/api/all.json')
+    city_transfer = {
+        '台北': '臺北市',
+        '台北市': '臺北市',
+        '台中': '臺中市',
+        '台中市': '臺中市',
+        '台南': '臺南市',
+        '台南市': '臺南市'
+    }
+    
+    for key, values in  city_transfer.items():
+        if city == key:
+            city = values
 
-        for item in json.loads(city_resp.text):
-            if item['name'] == city:
-                city_id = item['id']
+    weather = {
+        'Wx': '',
+        'MaxT': '',
+        'MinT': '',
+        'CI': '',
+        'PoP': ''
+    }
 
-        # 透過city_id, 查詢氣象資訊
-        weather_resp = requests.get('https://works.ioa.tw/weather/api/weathers/'+city_id+'.json')
-        weather_resp = json.loads(weather_resp.text)
-    except Exception as err:
+    # 政府開放資料, 天氣api
+    resp = requests.get('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=rdec-key-123-45678-011121314')
+    data = json.loads(resp.text)
+    records = data['records']['location'] # 各地區的預報紀錄
+    print(records[0]['weatherElement'][0]['time'][-1]['parameter']['parameterName'])
+
+    for record in records:
+        if record['locationName'] == city:
+            has_city = True
+            elements = record['weatherElement']
+            for element in elements:
+                if element['elementName'] == 'Wx': # 天氣現象
+                    weather['Wx'] = element['time'][-1]['parameter']['parameterName']
+                if element['elementName'] == 'MaxT': # 最高溫度
+                    weather['MaxT'] = element['time'][-1]['parameter']['parameterName']
+                if element['elementName'] == 'MinT': # 最低溫度
+                    weather['MinT'] = element['time'][-1]['parameter']['parameterName']
+                if element['elementName'] == 'CI': # 舒適度
+                    weather['CI'] = element['time'][-1]['parameter']['parameterName']
+                if element['elementName'] == 'PoP': # 降雨機率
+                    weather['PoP'] = element['time'][-1]['parameter']['parameterName']
+
+    if has_city is True:
+        resp = {
+            'status': '200',
+            'result': weather,
+            'msg': '取得某城市的天氣狀況成功'
+        }
+        return jsonify(resp)
+    else:
         resp = {
             'status': '404',
-            'result': err,
+            'result': '沒有此城市',
             'msg': '取得某城市的天氣狀況失敗'
         }
         return jsonify(resp)
 
-    weather = {
-        'desc': weather_resp['desc'],
-        'temperature': str(weather_resp['temperature']),
-        'felt_air_temp': str(weather_resp['felt_air_temp']),
-        'humidity': str(weather_resp['humidity']),
-        'rainfall': str(weather_resp['rainfall']),
-        'specials': []
-    }
-
-    # 如果有特別預報
-    if weather_resp['specials'] != []:
-        for item in weather_resp['specials']:
-            obj = {
-                'title': item['title'],
-                'status': item['status'],
-                'desc': item['desc'],
-                'at': str(item['at'])
-            }
-            weather['specials'].append(obj)
-
-    resp = {
-        'status': '200',
-        'result': weather,
-        'msg': '取得某城市的天氣狀況成功'
-    }
-    return jsonify(resp)
+    

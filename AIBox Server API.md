@@ -25,17 +25,18 @@
 
    > 手機端的用戶API，主要提供個人化相關的服務
 
-   | API Method | API URL                         | Desc                         | Req Params    | Resp Result                                                  |
-   | ---------- | ------------------------------- | ---------------------------- | ------------- | ------------------------------------------------------------ |
-   | POST       | URL/androidUser/login           | 手機端的登入                 | user_nickname |                                                              |
-   | POST       | URL/androidUser/logout          | 手機端的登出                 |               |                                                              |
-   | POST       | URL/androidUser/checkLogin      | 手機端檢查登入狀態           |               | 正在登入中的user_nickname                                    |
-   | GET        | URL/androidUser/getProfile      | 取得用戶的個人資訊           |               | nickname, gender, age, height, weight, bmi_value(值), bmi(狀況) |
-   | GET        | URL/androidUser/getHealth       | 取得用戶的生活習慣(健康狀況) |               | smoking, excercise, heart_problem, stroke, high_blood, high_cholesterol, diabetes, bmi_value, bmi |
-   | GET        | URL/androidUser/getNeedWater    | 取得用戶需要攝取的水量(c.c.) |               | 需要的水量 needwater                                         |
-   | GET        | URL/androidUser/getNeedCalorie  | 取得用戶需要攝取的熱量(大卡) |               | 需要的熱量 needcarlorie                                      |
-   | GET        | URL/androidUser/getConversation | 取得用戶的對話紀錄           |               | [{question, response, date}, ...] *(無資料則回空list)*       |
-   | GET        | URL/androidUser/getRemind       | 取得用戶的提醒資料           |               | [{remind_time, dosomething}, ...]  *(無資料則回空list)*      |
+   | API Method | API URL                         | Desc                                       | Req Params    | Resp Result                                                  |
+   | ---------- | ------------------------------- | ------------------------------------------ | ------------- | ------------------------------------------------------------ |
+   | POST       | URL/androidUser/login           | 手機端的登入                               | user_nickname |                                                              |
+   | POST       | URL/androidUser/logout          | 手機端的登出                               |               |                                                              |
+   | POST       | URL/androidUser/checkLogin      | 手機端檢查登入狀態                         |               | 正在登入中的user_nickname                                    |
+   | GET        | URL/androidUser/getProfile      | 取得用戶的個人資訊                         |               | nickname, gender, age, height, weight, bmi_value(值), bmi(狀況) |
+   | GET        | URL/androidUser/getHealth       | 取得用戶的生活習慣(健康狀況)               |               | smoking, excercise, heart_problem, stroke, high_blood, high_cholesterol, diabetes, bmi_value, bmi |
+   | GET        | URL/androidUser/getNeed         | 取得用戶需要攝取的水量(c.c.)及卡路里(大卡) |               | needwater, needcarlorie                                      |
+   | GET        | URL/androidUser/getConversation | 取得用戶的對話紀錄                         |               | [{question, response, date}, ...] *(無資料則回空list)*       |
+   | GET        | URL/androidUser/getRemind       | 取得用戶的提醒資料                         |               | [{remind_time, dosomething}, ...]  *(無資料則回空list)*      |
+   | POST       | URL/androidUser/concernLock     | 讓concern模組知道現在是對誰做關心          | user_nickname |                                                              |
+   | POST       | URL/androidUser/concernRelease  | 讓concern模組知道現在是對誰解除關心狀態    | user_nickname |                                                              |
 
    
 
@@ -43,12 +44,12 @@
 
    > 手機端的一般API，提供非登入就可使用功能
 
-   | API Method | API URL                     | Desc                                    | Req Params                   | Resp Result                                                  |
-   | ---------- | --------------------------- | --------------------------------------- | ---------------------------- | ------------------------------------------------------------ |
-   | GET        | URL/android/getRemind       | 取得未登入(user_nickname為空)的提醒資料 |                              | [{remind_time, dosomething}, ...] *(無資料則回空list)*       |
-   | GET        | URL/android/getAllLocation  | 取得所有查詢的地點                      |                              | [{location, region, number, unit, date}, ...] *(無資料則回空list)* |
-   | GET        | URL/android/getLastLocation | 取得最後一個(最新)查詢的地點            |                              | [{location, region, number, unit, date}, ...] *(無資料則回空list)* |
-   | GET        | URL/android/getWeather      | 取得某城市的天氣狀況                    | city (e.g. 台北、新竹、台南) | [{desc, temperature, felt_air_temp, humidity, rainfall, specials: [{title,  status, desc, at}] }] |
+   | API Method | API URL                     | Desc                                    | Req Params                         | Resp Result                                                  |
+   | ---------- | --------------------------- | --------------------------------------- | ---------------------------------- | ------------------------------------------------------------ |
+   | GET        | URL/android/getRemind       | 取得未登入(user_nickname為空)的提醒資料 |                                    | [{remind_time, dosomething}, ...] *(無資料則回空list)*       |
+   | GET        | URL/android/getAllLocation  | 取得所有查詢的地點                      |                                    | [{location, region, number, unit, date}, ...] *(無資料則回空list)* |
+   | GET        | URL/android/getLastLocation | 取得最後一個(最新)查詢的地點            |                                    | [{location, region, number, unit, date}, ...] *(無資料則回空list)* |
+   | GET        | URL/android/getWeather      | 取得某城市的天氣狀況                    | city (e.g. 臺北市、新北市、臺南市) | {Wx, MaxT, MinT, CI, PoP}                                    |
 
    * 詳細資料格式
 
@@ -58,21 +59,12 @@
        {
            "status": "200",
            "result": {	
-               "desc": 敘述,
-               "temperature": 溫度,
-               "felt_air_temp": 體感溫度,
-               "humidity": 濕度,
-               "rainfall": 雨量,
-               "specials"(特別預報): [
-                   {
-                       "title": 特別預報標題,
-                       "status": 特別預報狀態,
-                       "desc": 特別預報敘述,
-                       "at": 特別預報發布時間
-                   }
-               ]
-           }
-           ,
+               "Wx": 天氣現象,
+               "MaxT": 最高溫度(C),
+               "MinT": 最低溫度(C),
+               "CI": 舒適度,
+               "PoP": 降雨機率（%）
+           },
            "msg": ""
        }
        ~~~
@@ -80,21 +72,16 @@
        範例 (result 部分)：
 
        ~~~json
-       HTTP/1.1 200 OK
        {
-           "desc": "午後短暫雷陣雨",
-           "temperature": "27",
-           "felt_air_temp": "25",
-           "humidity": "92",
-           "rainfall": "5.0",
-           "specials": [
-               {
-                   "title": "大雨特報",
-                   "status": "大雨",
-                   "desc": "西南風增強，易有短時強降雨，今（１１）日臺南市、高雄市及屏東縣有局部大雨或豪雨發生的機率，中部以北地區、宜蘭地區及花蓮山區有局部大雨發生的機率，請注意雷擊及強陣風；連日降雨，亦請注意坍方、落石，民眾應避免進入山區及河川活動。",
-                   "at": "2016-07-11 12:05:00"
-               }
-           ]
+           "msg": "取得某城市的天氣狀況成功",
+           "result": {
+               "CI": "舒適至易中暑",
+               "MaxT": "34",
+               "MinT": "27",
+               "PoP": "60",
+               "Wx": "多雲時陰短暫陣雨或雷雨"
+           },
+           "status": "200"
        }
        ~~~
 
