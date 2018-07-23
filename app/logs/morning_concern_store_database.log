@@ -1,0 +1,13 @@
+Thu 19 Jul 2018 03:22:47 : ERROR : logging.py : 42 : 'user_nickname'
+Thu 19 Jul 2018 03:25:21 : ERROR : logging.py : 42 : 'user_nickname'
+Thu 19 Jul 2018 03:25:28 : ERROR : logging.py : 42 : 'user_nickname'
+Thu 19 Jul 2018 03:25:28 : ERROR : logging.py : 42 : 'user_nickname'
+Thu 19 Jul 2018 03:25:53 : ERROR : logging.py : 42 : 'user_nickname'
+Thu 19 Jul 2018 11:21:46 : ERROR : logging.py : 42 : 'user_nickname'
+Thu 19 Jul 2018 11:28:30 : ERROR : logging.py : 42 : 'login'
+Fri 20 Jul 2018 16:12:03 : ERROR : logging.py : 42 : local variable 'user_nickname' referenced before assignment
+Fri 20 Jul 2018 16:57:17 : ERROR : logging.py : 42 : local variable 'user_nickname' referenced before assignment
+Fri 20 Jul 2018 16:59:14 : ERROR : logging.py : 42 : name 'chin2time' is not defined
+Fri 20 Jul 2018 17:00:02 : ERROR : logging.py : 42 : name 'collect' is not defined
+Fri 20 Jul 2018 17:01:48 : ERROR : logging.py : 42 : name 'collect' is not defined
+Fri 20 Jul 2018 17:01:48 : ERROR : logging.py : 42 : name 'collect' is not defined

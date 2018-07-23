@@ -54,6 +54,9 @@ class User:
                 for data in self.word_domain:
                     if data['domain'] == '數字':
                         self.template['運動'] = data['word']
+                    elif data['domain'] == '時刻':
+                        self.template['運動'] = str(data['word']).rstrip('分')
+
             elif self.flag == 'user_heart':
                 for data in self.word_domain:
                     if data['word'] == '有' or data['word'] == '會' or data['word'] == '沒錯':

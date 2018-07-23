@@ -1,6 +1,0 @@
-train_models/
-__pycache__/
-.DS_Store
-.idea
-!Icon
-logs/

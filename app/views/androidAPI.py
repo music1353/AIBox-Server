@@ -142,9 +142,12 @@ def android_get_weather():
     '''
 
     city = request.args.get('city')
+    print(city)
     has_city = False
 
     city_transfer = {
+        '新北': '新北市',
+        '新北市': '新北市',
         '台北': '臺北市',
         '台北市': '臺北市',
         '台中': '臺中市',

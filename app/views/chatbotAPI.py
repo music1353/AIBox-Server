@@ -143,7 +143,7 @@ def chatbot_chatbot_resp():
         if login_doc['is_login']==True:
             global times
             times = times + 10
-        
+        print(message)
         return message
     else:
         login_collect.update({'_id': 0}, {'$set': {'is_login': True, "user_nickname": has_user_nickname_doc['nickname']}})

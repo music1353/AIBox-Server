@@ -245,7 +245,7 @@ class Concern:
                 content['response'] = self.template['鬧鐘回覆']
             else:
                 content['flag'] = 'noon_concern_done'
-                content['reponse'] = self.template['完成回覆']
+                content['response'] = self.template['完成回覆']
                 self.store_database()
                 self.clean_template()
 

@@ -63,19 +63,27 @@ def androidUser_logout():
         }
     '''
 
-    print('androidUser logout status:', session['login'])
-    print('androidUser logout user_nickname:', session['user_nickname'])
+    if(session.get('login') != None):
+        print('androidUser logout status:', session['login'])
+        print('androidUser logout user_nickname:', session['user_nickname'])
 
-    # 刪除session
-    session.pop('login', None)
-    session.pop('user_nickname', None)
+        # 刪除session
+        session.pop('login', None)
+        session.pop('user_nickname', None)
 
-    resp = {
-        'status': '200',
-        'result': '',
-        'msg': '登出成功'
-    }
-    return jsonify(resp)
+        resp = {
+            'status': '200',
+            'result': '',
+            'msg': '登出成功'
+        }
+        return jsonify(resp)
+    else:
+        resp = {
+            'status': '404',
+            'result': '',
+            'msg': '原本就沒有此登入紀錄, 登出失敗'
+        }
+        return jsonify(resp)
 
 @app.route('/api/androidUser/checkLogin', methods=['POST'])
 def androidUser_check_login():
@@ -122,7 +130,7 @@ def androidUser_get_profile():
         }
     '''
     
-    if(session.get('user_nickname') != None):
+    if(session.get('user_nickname') is not None):
         user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
@@ -162,7 +170,7 @@ def androidUser_get_health():
         }
     '''
 
-    if(session.get('user_nickname') != None):
+    if(session.get('user_nickname') is not None):
         user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
@@ -192,7 +200,7 @@ def androidUser_get_need():
         }
     '''
 
-    if(session.get('user_nickname') != None):
+    if(session.get('user_nickname') is not None):
         user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
@@ -229,7 +237,7 @@ def androidUser_get_conversation():
         }
     '''
 
-    if(session.get('user_nickname') != None):
+    if(session.get('user_nickname') is not None):
         user_nickname = session.get('user_nickname')
         collect = db['users']
         user_doc = collect.find_one({'nickname': user_nickname})
@@ -308,7 +316,7 @@ def androidUser_concern_lock():
     # 記錄到db
     concern_lock_collect = db['concern_lock']
     concern_lock_collect.update({'_id': 0}, {'$set':{'user_nickname': user_nickname, 'lock': True, 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}})
-    
+    #
     resp = {
         'status': '200',
         'result': '',
