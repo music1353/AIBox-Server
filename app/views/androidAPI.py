@@ -172,7 +172,6 @@ def android_get_weather():
     resp = requests.get('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=rdec-key-123-45678-011121314')
     data = json.loads(resp.text)
     records = data['records']['location'] # 各地區的預報紀錄
-    print(records[0]['weatherElement'][0]['time'][-1]['parameter']['parameterName'])
 
     for record in records:
         if record['locationName'] == city:
