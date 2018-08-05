@@ -48,9 +48,10 @@ night流程:
 
 class Concern:
     # 讀取對應的關心模板並收集word
-    def __init__(self, word_domain=None, flag=None):
+    def __init__(self, word_domain=None, flag=None, nickname=None):
         self.flag = flag
         self.word_domain = word_domain
+        self.nickname = nickname
 
         # 判斷是哪種concern, 就選擇那種模板
         if 'morning' in self.flag:
@@ -180,7 +181,10 @@ class Concern:
         if 'morning' in self.flag:
             if self.template['用餐'] == '':
                 content['flag'] = 'morning_dining'
-                content['response'] = self.template['用餐回覆']
+                if self.nickname is not None:
+                    content['response'] = self.nickname + '，' + self.template['用餐回覆']
+                else:
+                    content['response'] = self.template['用餐回覆']
             elif self.template['量血壓'] == '':
                 content['flag'] = 'morning_measure_blood_pressure'
                 content['response'] = self.template['量血壓回覆']
@@ -230,7 +234,10 @@ class Concern:
         elif 'noon' in self.flag:
             if self.template['用餐'] == '':
                 content['flag'] = 'noon_dining'
-                content['response'] = self.template['用餐回覆']
+                if self.nickname is not None:
+                    content['response'] = self.nickname + '，' + self.template['用餐回覆']
+                else:
+                    content['response'] = self.template['用餐回覆']
             elif self.template['小睡'] == '':
                 print('snapppp:', self.template['用餐'])
                 content['flag'] = 'noon_snap'
@@ -254,7 +261,10 @@ class Concern:
         elif 'night' in self.flag:
             if self.template['用餐'] == '':
                 content['flag'] = 'night_dining'
-                content['response'] = self.template['用餐回覆']
+                if self.nickname is not None:
+                    content['response'] = self.nickname + '，' + self.template['用餐回覆']
+                else:
+                    content['response'] = self.template['用餐回覆']
             elif self.template['量血壓'] == '':
                 content['flag'] = 'night_measure_blood_pressure'
                 content['response'] = self.template['量血壓回覆']

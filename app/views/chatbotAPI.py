@@ -3,7 +3,7 @@ from config import BASE_DIR, MODEL_DIR, MONGO_URI
 from flask import jsonify, request
 from app.modules.domain_matcher.matcher import Matcher
 from app.modules.domain_chatbot.chatbot import Chatbot
-from threading import Timer
+from flask import session
 import os
 import pymongo
 import time
@@ -21,7 +21,7 @@ client = pymongo.MongoClient(MONGO_URI)
 db = client['aiboxdb']
 print('chatbot api success connect to mongodb.')
 
-times = 30 # global倒數var
+times = 300 # global倒數var
 def logout_timeout():
     '''登出倒數計時方法，配合thread使用'''
     global times
@@ -136,7 +136,7 @@ def chatbot_chatbot_resp():
         pp.pprint(domain_score)
         
         # 根據domain_score，做相對應的回覆
-        chat = Chatbot(domain_score, flag=flag)
+        chat = Chatbot(domain_score, flag=flag, nickname=session.get('user_nickname'))
         message = chat.response_word()
         
         # 若有nickname正在登入，且有繼續在對話，則登出時間延後
@@ -150,7 +150,7 @@ def chatbot_chatbot_resp():
         print(user_nickname)
         resp = {
             'flag': '',
-            'response': '登入成功'
+            'response': '音箱登入成功'
         }
         
         # 登出倒數

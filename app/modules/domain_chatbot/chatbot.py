@@ -9,7 +9,7 @@ from app.modules.domain_chatbot.special import Special
 class Chatbot:
 
     # 取domain不為'none'的，flag為'user_nickname'不需剔除
-    def __init__(self, domain_score, flag=None):
+    def __init__(self, domain_score, flag=None, nickname=None):
 
         if flag == 'user_nickname':
             word_domain = []
@@ -36,6 +36,7 @@ class Chatbot:
         
         self.word_domain = word_domain
         self.flag = flag
+        self.nickname = nickname
 
     # 根據flag及domain決定選擇哪個模組的覆流程
     # flag -> None or user_done or disease_done or location_done 表示完成該模組的回覆流程
@@ -65,7 +66,7 @@ class Chatbot:
                 return reminder.response()
             # 決定為morningconcern的模組流程
             elif domain == 'morningconcern':
-                concern = Concern(word_domain=self.word_domain, flag='morning_init')
+                concern = Concern(word_domain=self.word_domain, flag='morning_init', nickname=self.nickname)
                 return concern.response()
             # 決定為noonconcern的模組流程
             elif domain == 'noonconcern':

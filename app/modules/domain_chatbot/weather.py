@@ -114,7 +114,8 @@ class Weather:
     def clean_template(self):
         
         for key in dict(self.template).keys():
-            self.template[key] = ''
+            if self.template[key] != '地區回覆':
+                self.template[key] = ''
 
         with open(os.path.join(BASE_DIR, 'domain_chatbot/template/weather.json'), 'w', encoding='UTF-8') as output:
             json.dump(self.template, output, indent=4, ensure_ascii=False)

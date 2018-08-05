@@ -175,9 +175,10 @@ class Reminder:
                 '_id': collect.count() + 1,
                 'user_nickname': user_nickname,
                 'remind_time': remind_time,
-                'dosomething': self.template['事情'],
+                'dosomething': user_nickname + '，您該' + self.template['事情'],
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
+            print(database_template)
             collect.insert_one(database_template)
             logger.debug_msg('successfully store to database')
         except ConnectionError as err:
