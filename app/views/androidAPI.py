@@ -161,11 +161,12 @@ def android_get_weather():
             city = values
 
     weather = {
-        'Wx': '',
-        'MaxT': '',
-        'MinT': '',
-        'CI': '',
-        'PoP': ''
+        'Wx': '', # 天氣現象
+        'MaxT': '', # 最高溫度
+        'MinT': '', # 最低溫度
+        'CI': '', # 舒適度
+        'PoP': '', # 降雨機率
+        'info': '' # 讓app可以換相對應的背景
     }
 
     # 政府開放資料, 天氣api
@@ -189,6 +190,17 @@ def android_get_weather():
                     weather['CI'] = element['time'][-1]['parameter']['parameterName']
                 if element['elementName'] == 'PoP': # 降雨機率
                     weather['PoP'] = element['time'][-1]['parameter']['parameterName']
+            
+            # app天氣背景資訊
+            if '雨' in weather['Wx']:
+                weather['info'] = 'rainy'
+            elif '晴' in weather or '熱' in weather:
+                weather['info'] = 'sunny'
+            elif '雲' in weather['Wx']:
+                weather['info'] = 'cloudy'
+            else:
+                weather['info'] = 'cloudy'
+            
 
     if has_city is True:
         resp = {

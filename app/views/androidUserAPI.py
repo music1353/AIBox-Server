@@ -351,6 +351,48 @@ def androidUser_concern_release():
     }
     return jsonify(resp)
 
+@app.route('/api/androidUser/locationLockStatus', methods=['GET'])
+def androidUser_location_lock_status():
+    '''讓APP端確認是否需要開啟地圖服務
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': ''
+            'msg': 訊息
+        }
+    '''
 
+    # 記錄到db
+    location_lock_collect = db['location_lock']
+    location_lock_collect_doc = location_lock_collect.find_one({'_id': 0})
+    print(location_lock_collect_doc)
+    lock_status = location_lock_collect_doc['lock']
     
-    
+    resp = {
+        'status': '200',
+        'result': lock_status,
+        'msg': '啟用地圖服務'
+    }
+    return jsonify(resp)
+
+@app.route('/api/androidUser/locationRelease', methods=['POST'])
+def androidUser_location_release():
+    '''解除app端地圖服務狀態
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': ''
+            'msg': 訊息
+        }
+    '''
+
+    # lock
+    location_lock_collect = db['location_lock']
+    location_lock_collect.update({'_id': 0}, {'$set':{'lock': False, 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}})
+
+    resp = {
+        'status': '200',
+        'result': '',
+        'msg': '退出地圖服務'
+    }
+    return jsonify(resp)

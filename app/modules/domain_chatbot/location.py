@@ -27,10 +27,8 @@ class Location:
                         self.template['地點'] = data['word']
                     if data['domain'] == '城市':
                         self.template['區域'] = data['word']
-                    # 180706, 新增street.json
                     if data['domain'] == '街道':
                         self.template['區域'] = self.template['區域'] + data['word']
-                    # 180711, 新增roadsection.json
                     if data['domain'] == '路段':
                         self.template['區域'] = self.template['區域'] + data['word']
                     if data['domain'] == '數字':
@@ -88,6 +86,11 @@ class Location:
             }
             collect.insert_one(database_template)
             logger.debug_msg('successfully store to database')
+
+            # location lock
+            location_lock_collect = db['location_lock']
+            location_lock_collect.update({'_id': 0}, {'$set':{'lock': True, 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}})
+            
         except ConnectionError as err:
             logger.error_msg(err)
 
