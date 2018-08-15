@@ -1,6 +1,1 @@
-{
-    "domain": "路段",
-    "concepts": [
-        "一段", "二段", "三段", "四段", "五段", "六段", "七段", "八段", "九段"
-    ]
-}
+{"domain": "路段", "concepts": ["一段", "二段", "三段", "四段", "五段", "六段", "七段", "八段", "九段"], "pinyin_concepts": ["yi-duan", "er-duan", "san-duan", "si-duan", "wu-duan", "liu-duan", "qi-duan", "ba-duan", "jiu-duan"]}

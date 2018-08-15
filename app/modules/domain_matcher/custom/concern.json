@@ -1,6 +1,1 @@
-{
-  "domain": "關心",
-  "concepts": [
-      "morningconcern", "noonconcern", "nightconcern"
-  ]
-}
+{"domain": "關心", "concepts": ["morningconcern", "noonconcern", "nightconcern"], "pinyin_concepts": ["morningconcern", "noonconcern", "nightconcern"]}

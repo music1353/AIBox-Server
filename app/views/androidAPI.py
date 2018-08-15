@@ -1,5 +1,5 @@
 from app import app
-from config import MONGO_URI
+from config import MONGO_URI, client
 from flask import session, request, jsonify
 import pymongo
 import requests
@@ -7,9 +7,7 @@ import json
 from datetime import datetime
 
 # 連進MongoDB
-client = pymongo.MongoClient(MONGO_URI)
 db = client['aiboxdb']
-print('android api success connect to mongodb.')
 
 @app.route('/api/android/getRemind', methods=['GET'])
 def android_get_remind():

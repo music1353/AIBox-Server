@@ -4,7 +4,7 @@ import pymongo
 import datetime
 import app.modules.logger.logging as log
 from app.modules.health_calculator import blood_pressure
-from config import BASE_DIR, LOG_DIR, MONGO_URI
+from config import BASE_DIR, LOG_DIR, MONGO_URI, client
 from flask import session
 import requests
 from app.modules.time_transfer import chin2time
@@ -318,7 +318,6 @@ class Concern:
         logger.run(LOG_DIR)
 
         try:
-            client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             user_collect = db['users']
 

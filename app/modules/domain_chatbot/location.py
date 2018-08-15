@@ -4,7 +4,7 @@ import pymongo
 import datetime
 import app.modules.logger.logging as log
 from app.modules.domain_chatbot.user import User
-from config import BASE_DIR, LOG_DIR, MONGO_URI
+from config import BASE_DIR, LOG_DIR, MONGO_URI, client
 
 class Location:
 
@@ -72,7 +72,6 @@ class Location:
         logger = log.Logging('location:store_database')
         logger.run(LOG_DIR)
         try:
-            client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             collect = db['location']
 

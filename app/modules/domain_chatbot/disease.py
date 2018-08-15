@@ -4,7 +4,7 @@ import pymongo
 import app.modules.logger.logging as log
 from app.modules.domain_chatbot.user import User
 import datetime
-from config import BASE_DIR, LOG_DIR, MONGO_URI
+from config import BASE_DIR, LOG_DIR, MONGO_URI, client
 
 class Disease:
     # 讀取disease.json的模板並收集word
@@ -50,7 +50,6 @@ class Disease:
         logger = log.Logging('disease:get_data_form_database')
         logger.run(LOG_DIR)
         try:
-            client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             if self.template['類別'] == 'cold':
                 collect = db['cold']

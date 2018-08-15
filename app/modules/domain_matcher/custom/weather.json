@@ -1,6 +1,1 @@
-{
-  "domain": "天氣",
-  "concepts": [
-      "天氣", "氣象"
-  ]
-}
+{"domain": "天氣", "concepts": ["天氣", "氣象"], "pinyin_concepts": ["tian-qi", "qi-xiang"]}

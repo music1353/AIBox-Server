@@ -4,7 +4,7 @@ import pymongo
 import datetime
 import app.modules.logger.logging as log
 from app.modules.health_calculator import bmi, stroke_score
-from config import BASE_DIR, LOG_DIR, MONGO_URI
+from config import BASE_DIR, LOG_DIR, MONGO_URI, client
 
 class User:
     # 讀取user.json的模板並收集word
@@ -143,7 +143,7 @@ class User:
         logger = log.Logging('user:store_database')
         logger.run(LOG_DIR)
         try:
-            client = pymongo.MongoClient(MONGO_URI)
+            # client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             collect = db['users']
 
@@ -203,7 +203,7 @@ class User:
             print('no user_nickname')
             pass
         else:
-            client = pymongo.MongoClient(MONGO_URI)
+            # client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             collect = db['users']
 

@@ -1,5 +1,5 @@
 from app import app
-from config import BASE_DIR, MODEL_DIR, MONGO_URI
+from config import BASE_DIR, MODEL_DIR, MONGO_URI, client
 from flask import jsonify, request
 from app.modules.domain_matcher.matcher import Matcher
 from app.modules.domain_chatbot.chatbot import Chatbot
@@ -17,9 +17,7 @@ pp = pprint.PrettyPrinter(indent=4)
 pp.pprint(matcher.rule_data)
 
 # 連進MongoDB
-client = pymongo.MongoClient(MONGO_URI)
 db = client['aiboxdb']
-print('chatbot api success connect to mongodb.')
 
 times = 300 # global倒數var
 def logout_timeout():

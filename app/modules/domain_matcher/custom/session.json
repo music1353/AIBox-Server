@@ -1,6 +1,1 @@
-{
-    "domain": "時段",
-    "concepts": [
-        "上午", "下午", "早上", "晚上"
-    ]
-}
+{"domain": "時段", "concepts": ["上午", "下午", "早上", "晚上"], "pinyin_concepts": ["shang-wu", "xia-wu", "zao-shang", "wan-shang"]}

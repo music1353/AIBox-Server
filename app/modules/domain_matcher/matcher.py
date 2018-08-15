@@ -6,6 +6,10 @@ from config import BASE_DIR, LOG_DIR
 import fnmatch
 from app.modules.domain_chatbot.user import User
 from gensim.models import word2vec
+from app.modules.pinyin_compare import pinyin
+import threading
+import queue
+from time import ctime
 
 class Matcher():
     def __init__(self):
@@ -171,9 +175,37 @@ class Matcher():
                     data = json.load(f)
                     file_data.append(data)
 
+        # 多個thread去比對
+        threads = []
+        q = queue.Queue()
+
         for rule in file_data:
-            domain = rule['domain']
-            for concept in rule['concepts']:
-                if word == concept:
-                    return domain
-        return None
+            t = threading.Thread(target=self.custom_compare, args=(q, rule, word))
+            threads.append(t)
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join()
+
+        if not q.empty():
+            return q.get()
+        else:
+            return None
+
+
+    def custom_compare(self, q, rule, word):
+        domain = rule['domain']
+        print(domain, 'start thread at :', ctime())
+
+        get_result_flag = False
+        for concept in rule['pinyin_concepts']:
+            if pinyin.compare_with_pinyin(word, concept):
+                q.put(domain)
+                get_result_flag = True
+                print(domain, 'done thread at :', ctime())
+                break
+        
+        if get_result_flag is False:
+            print(domain, 'done thread at :', ctime())
