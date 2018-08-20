@@ -348,3 +348,67 @@ def androidUser_concern_release():
         'msg': user_nickname + '退出提醒狀態'
     }
     return jsonify(resp)
+
+@app.route('/api/androidUser/dailyConcern', methods=['GET'])
+def androidUser_get_daily_concern():
+    '''取得使用者的daily concern資訊
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': 使用者的daily concern訊息
+            'msg': 訊息
+        }
+    '''
+
+    if(session.get('user_nickname') is not None):
+        user_nickname = session.get('user_nickname')
+        collect = db['users']
+        user_doc = collect.find_one({'nickname': user_nickname})
+    else:
+        resp = {
+            'status': '404',
+            'result': '未登入',
+            'msg': '取得用戶daily concern錯誤'
+        }
+        return jsonify(resp)
+
+    daily_concern_data = user_doc['daily_concern']
+
+    daily_concern_list = [] # 擺放整理後的結果
+    date_list = []
+    
+    # 過濾日期
+    for data in daily_concern_data:
+        date = data['date'].split(' ')[0]
+        if date not in date_list:
+            date_list.append(date)
+
+    # 算各日期平均
+    for date in date_list:
+        count = 0
+        diastolic = 0
+        systolic = 0
+
+        for data in daily_concern_data:
+            concern_date = data['date'].split(' ')[0]
+
+            if concern_date == date and 'diastolic' in data and data['diastolic']!='':
+                count = count + 1
+                diastolic = diastolic + int(data['diastolic'])
+                systolic = systolic + int(data['systolic'])
+        
+        if count != 0:
+            obj = {
+                'date': date,
+                'diastolic': str(diastolic/count),
+                'systolic': str(systolic/count)
+            }
+            daily_concern_list.append(obj)
+
+    resp = {
+        'status': '200',
+        'result': daily_concern_list,
+        'msg': '取得daily_concern成功'
+    }
+    return jsonify(resp)
+    
