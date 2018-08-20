@@ -39,6 +39,7 @@
    | POST       | URL/androidUser/concernRelease     | 讓concern模組知道現在是對誰解除關心狀態    | user_nickname |                                                              |
    | GET        | URL/androidUser/locationLockStatus | 查看location lock的狀態                    |               | lock_status *(Boolean. True表示使用者詢問了地點資訊)*        |
    | POST       | URL/androidUser/locationRelease    | 釋放location Lock的狀態                    |               |                                                              |
+   | GET        | URL/androidUser/dailyConcern       | 取得使用者的daily concern資訊              |               | [{date,  diastolic.  systolic}]                              |
 
    
 
