@@ -1,0 +1,5 @@
+{
+    "domain": "醫院問題",
+    "concepts": ["機構名稱", "權屬別", "型態別", "縣市鄉鎮", "電話", "地址", "診療科別", "醫院評價", "西醫生", "中醫師", "牙醫師", "藥師", "藥劑生", "護理師", "護士", "助產士", "助產師", "醫事檢驗師", "醫事檢驗生", "物理治療師", "職能治療師", "醫事放射師", "醫事放射士", "物理治療生", "呼吸治療師", "職能治療生", "諮商心理師", "臨床心理師", "營養師", "語言治療師", "牙體技術師", "聽力師", "牙體技術生"],
+    "pinyin_concepts": ["ji-gou-ming-cheng", "quan-shu-bie", "xing-tai-bie", "xian-shi-xiang-zhen", "dian-hua", "di-zhi", "zhen-liao-ke-bie", "yi-yuan-ping-jia", "xi-yi-sheng", "zhong-yi-shi", "ya-yi-shi", "yao-shi", "yao-ji-sheng", "hu-li-shi", "hu-shi", "zhu-chan-shi", "zhu-chan-shi", "yi-shi-jian-yan-shi", "yi-shi-jian-yan-sheng", "wu-li-zhi-liao-shi", "zhi-neng-zhi-liao-shi", "yi-shi-fang-she-shi", "yi-shi-fang-she-shi", "wu-li-zhi-liao-sheng", "hu-xi-zhi-liao-shi", "zhi-neng-zhi-liao-sheng", "zi-shang-xin-li-shi", "lin-chuang-xin-li-shi", "ying-yang-shi", "yu-yan-zhi-liao-shi", "ya-ti-ji-shu-shi", "ting-li-shi", "ya-ti-ji-shu-sheng"]
+}
