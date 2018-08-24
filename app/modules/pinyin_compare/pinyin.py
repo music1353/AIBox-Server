@@ -2,6 +2,9 @@ from xpinyin import Pinyin
 
 p = Pinyin()
 
+def to_pinyin(word):
+    return p.get_pinyin(word)
+
 # word_1 & word_2 都不是拼音
 def compare(word_1, word_2):
     pinyin_1 = p.get_pinyin(word_1)

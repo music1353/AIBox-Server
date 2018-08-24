@@ -3,7 +3,7 @@ from config import MONGO_URI, client
 from flask import session, request, jsonify
 import pymongo
 from app.modules.health_calculator import health
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # 連進MongoDB
 db = client['aiboxdb']
@@ -376,14 +376,42 @@ def androidUser_get_daily_concern():
 
     daily_concern_list = [] # 擺放整理後的結果
     date_list = []
-    
+
+    today = datetime.today()
+    print('today:', today)
+    todayNum = datetime.today().weekday()
+    print('todayNum:', todayNum)
+    date_diff = -1
+
+    # 0 => 星期一, 1 => 星期二, 2 => 星期三, etc
+    if todayNum == 0:
+        date_diff = 1
+    elif todayNum == 1:
+        date_diff = 2
+    elif todayNum == 2:
+        date_diff = 3
+    elif todayNum == 3:
+        date_diff = 4
+    elif todayNum == 4:
+        date_diff = 5
+    elif todayNum == 5:
+        date_diff = 6
+    elif todayNum == 6:
+        date_diff = 0
+    print('date_diff:', date_diff)
+
     # 過濾日期
     for data in daily_concern_data:
-        date = data['date'].split(' ')[0]
-        if date not in date_list:
-            date_list.append(date)
+        date_str = data['date']
+        date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
 
-    # 算各日期平均
+        if (today - date).days <= date_diff:
+            date = date_str.split(' ')[0]
+            print(date)
+            if date not in date_list:
+                date_list.append(date)
+
+        # 算各日期平均
     for date in date_list:
         count = 0
         diastolic = 0
@@ -399,6 +427,7 @@ def androidUser_get_daily_concern():
         
         if count != 0:
             obj = {
+                'dateWeekNum': datetime.strptime(date, '%Y-%m-%d').weekday(),
                 'date': date,
                 'diastolic': str(diastolic/count),
                 'systolic': str(systolic/count)

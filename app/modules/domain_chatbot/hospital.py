@@ -3,6 +3,7 @@ import json
 import pymongo
 import datetime
 import app.modules.logger.logging as log
+from app.modules.pinyin_compare import pinyin
 from app.modules.domain_chatbot.user import User
 from config import BASE_DIR, LOG_DIR, MONGO_URI, client
 
@@ -25,6 +26,7 @@ class Hospital:
                 for data in self.word_domain:
                     if data['domain'] == '醫院':
                         self.template['醫院'] = data['word']
+                        self.template['醫院拼音'] = pinyin.to_pinyin(data['word'])
                     if data['domain'] == '醫院問題':
                         self.template['醫院問題'] = data['word']
             else:
@@ -48,8 +50,9 @@ class Hospital:
             # 去醫院開放資料找到對應的資訊
             db = client['aiboxdb']
             hospital_collect = db['hospital']
-            hospital_doc = hospital_collect.find_one({'機構名稱': {'$regex': self.template['醫院']}})
-
+            hospital_doc = hospital_collect.find_one({'機構名稱': {'$regex': self.template['醫院拼音']}})
+            print(self.template['醫院拼音'])
+            
             # 回覆查到的資訊
             if self.template['醫院問題'] in hospital_doc:
                 self.template['查詢結果'] = '{0}的{1}是{2}'.format(self.template['醫院'], self.template['醫院問題'], hospital_doc[self.template['醫院問題']])
