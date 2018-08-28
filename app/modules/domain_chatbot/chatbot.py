@@ -44,7 +44,7 @@ class Chatbot:
     # flag -> user_xxx or disease_xxx or loaction_xxx 表處於哪個模組的回覆流程中
     def response_word(self):
         # TODO 新增 or concern_done
-        if self.flag is None or self.flag=='user_done' or self.flag=='hospital_done' or self.flag=='disease_done' or self.flag=='weather_done' or self.flag=='location_done' or self.flag=='reminder_done' or self.flag=='morning_concern_done' or self.flag=='noon_concern_done':
+        if self.flag is None or self.flag=='special_done' or self.flag=='user_done' or self.flag=='hospital_done' or self.flag=='disease_done' or self.flag=='weather_done' or self.flag=='location_done' or self.flag=='reminder_done' or self.flag=='morning_concern_done' or self.flag=='noon_concern_done':
             domain = self.choose_domain()
             if domain == 'user':
                 user = User()

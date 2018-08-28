@@ -25,16 +25,21 @@ class Hospital:
             if self.flag == 'hospital_init':
                 for data in self.word_domain:
                     if data['domain'] == '醫院':
-                        self.template['醫院'] = data['word']
+                        # self.template['醫院'] = data['word']
                         self.template['醫院拼音'] = pinyin.to_pinyin(data['word'])
                     if data['domain'] == '醫院問題':
                         self.template['醫院問題'] = data['word']
-            else:
-                if self.flag == 'hospital_ques_get':
-                    for data in self.word_domain:
-                        if data['domain'] == '醫院問題':
-                            self.template['醫院問題'] = data['word']
-                                
+            elif self.flag == 'hospital_ques_get':
+                for data in self.word_domain:
+                    if data['domain'] == '醫院問題':
+                        self.template['醫院問題'] = data['word']
+            elif self.flag == 'hospital_phone':
+                for data in self.word_domain:
+                    if data['domain'] == '是':
+                        self.template['打電話'] = data['word']
+                    elif data['domain'] == '非':
+                        self.template['不打電話'] = data['word']
+
         with open(os.path.join(BASE_DIR, 'domain_chatbot/template/hospital.json'), 'w',encoding='UTF-8') as output:
             json.dump(self.template, output, indent=4, ensure_ascii=False)
 
@@ -50,20 +55,41 @@ class Hospital:
             # 去醫院開放資料找到對應的資訊
             db = client['aiboxdb']
             hospital_collect = db['hospital']
-            hospital_doc = hospital_collect.find_one({'機構名稱': {'$regex': self.template['醫院拼音']}})
-            print(self.template['醫院拼音'])
-            
+            hospital_doc = hospital_collect.find_one({'拼音機構名稱': {'$regex': self.template['醫院拼音']}})
+
+            flag = ''
+            response = ''
             # 回覆查到的資訊
-            if self.template['醫院問題'] in hospital_doc:
-                self.template['查詢結果'] = '{0}的{1}是{2}'.format(self.template['醫院'], self.template['醫院問題'], hospital_doc[self.template['醫院問題']])
+            if self.template['醫院問題'] in hospital_doc and hospital_doc != None:
+                self.template['醫院'] = hospital_doc['機構名稱']
+
+                # 若是問電話，則問是否需要撥打電話
+                if self.template['醫院問題'] == '電話':
+                    if self.template['打電話'] != '':
+                        flag = 'hospital_done'
+                        response = self.template['打電話回覆']
+                        self.clean_template()
+                    elif self.template['不打電話'] != '':
+                        flag = 'hospital_done'
+                        response = self.template['不打電話回覆']
+                        self.clean_template()
+                    else:
+                        response = '{0}的{1}是{2},{3}'.format(self.template['醫院'], self.template['醫院問題'], hospital_doc[self.template['醫院問題']], self.template['電話問題回覆'])
+                        flag = 'hospital_phone'
+                else:
+                    response = '{0}的{1}是{2}'.format(self.template['醫院'], self.template['醫院問題'], hospital_doc[self.template['醫院問題']])
+                    flag = 'hospital_done'
+                    self.clean_template()
             else:
                 self.template['查詢結果'] = '沒有查詢到您想要的資訊'
+                self.clean_template()
 
-            content['flag'] = 'hospital_done'
-            content['response'] = self.template['查詢結果']
-            
-            self.clean_template()
+            content['flag'] = flag
+            content['response'] = response
+
             self.store_conversation(content['response'])
+            if self.template['醫院'] != '':
+                self.store_conversation('醫院名稱: ' + self.template['醫院'])
 
         return json.dumps(content, ensure_ascii=False)
 

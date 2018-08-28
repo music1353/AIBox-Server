@@ -215,4 +215,37 @@ def android_get_weather():
         }
         return jsonify(resp)
 
-    
+@app.route('/api/android/getHospital')
+def android_get_hospital():
+    '''取得醫院的資訊
+    Params:
+        hospital: 醫院名稱
+    Returns:
+        {
+            'status': '200'->取得成功; '404'->取得失敗
+            'result': 取得醫院的資訊; 錯誤訊息
+            'msg': 訊息
+        }
+    '''
+
+    hospital = request.args.get('hospital')
+
+    db = client['aiboxdb']
+    hospital_collect = db['hospital']
+    hospital_doc = hospital_collect.find_one({'機構名稱': {'$regex': hospital}})
+
+    if hospital_doc != None:
+        hospital_doc.pop('_id')
+        resp = {
+            'status': '200',
+            'result': hospital_doc,
+            'msg': '取得醫院資訊成功'
+        }
+        return jsonify(resp)
+    else:
+        resp = {
+            'status': '404',
+            'result': '沒有此醫院',
+            'msg': '取得醫院資訊失敗'
+        }
+        return jsonify(resp)
