@@ -1,9 +1,13 @@
 from app import app
-from config import MONGO_URI, client
+from config import MONGO_URI, BASE_DIR, client
 from flask import session, request, jsonify
 import pymongo
 from app.modules.health_calculator import health
+from app.modules import jieba_tw as jieba_tw
+from app.modules.pinyin_compare import pinyin
 from datetime import datetime, timedelta
+import os
+import json
 
 # 連進MongoDB
 db = client['aiboxdb']
@@ -441,3 +445,72 @@ def androidUser_get_daily_concern():
     }
     return jsonify(resp)
     
+@app.route('/api/androidUser/setECP', methods=['POST'])
+def set_ECP():
+    '''設定使用者的緊急聯絡人
+    Params:
+        ec_person: 緊急聯絡人的名字
+        ec_phone: 緊急聯絡人的電話
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': 設置是否成功
+            'msg': 訊息
+        }
+    '''
+
+    ec_person = request.json['ec_person']
+    ec_phone = request.json['ec_phone']
+
+    if(session.get('user_nickname') is not None):
+        user_nickname = session.get('user_nickname')
+        collect = db['users']
+    else:
+        resp = {
+            'status': '404',
+            'result': '未登入',
+            'msg': '設置緊急聯絡人錯誤'
+        }
+        return jsonify(resp)
+
+    contact_info = {
+        'person': pinyin.to_pinyin(ec_person),
+        'phone': ec_phone,
+        'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    try:
+        # 加進mydict
+        with open(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'), 'a+') as f:
+            f.write('\n')
+            f.write(ec_person+" 100000 N")
+        jieba_tw.set_dictionary(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'))
+
+        # 加進domain
+        with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'r') as f:
+            ec_file = json.load(f)
+            ec_file['concepts'].append(ec_person)
+            ec_file['pinyin_concepts'].append(pinyin.to_pinyin(ec_person))
+
+            with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'w') as output:
+                output.write(json.dumps(ec_file, ensure_ascii=False))
+
+        # 存進db
+        collect.find_one_and_update({'nickname': user_nickname}, {'$push': {'emergency_contact': contact_info}}, upsert=False)
+
+        resp = {
+            'status': '200',
+            'result': '設置緊急聯絡人成功',
+            'msg': ''
+        }
+        return jsonify(resp)
+    except:
+        resp = {
+            'status': '404',
+            'result': '設置緊急聯絡人錯誤',
+            'msg': '新增至資料庫錯誤'
+        }
+        return jsonify(resp)
+    
+    
+

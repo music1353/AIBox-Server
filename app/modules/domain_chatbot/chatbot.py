@@ -1,4 +1,5 @@
 from app.modules.domain_chatbot.user import User
+from app.modules.domain_chatbot.emergency import Emergency
 from app.modules.domain_chatbot.hospital import Hospital
 from app.modules.domain_chatbot.disease import Disease
 from app.modules.domain_chatbot.weather import Weather
@@ -44,11 +45,15 @@ class Chatbot:
     # flag -> user_xxx or disease_xxx or loaction_xxx 表處於哪個模組的回覆流程中
     def response_word(self):
         # TODO 新增 or concern_done
-        if self.flag is None or self.flag=='special_done' or self.flag=='user_done' or self.flag=='hospital_done' or self.flag=='disease_done' or self.flag=='weather_done' or self.flag=='location_done' or self.flag=='reminder_done' or self.flag=='morning_concern_done' or self.flag=='noon_concern_done':
+        if self.flag is None or self.flag=='special_done' or self.flag=='user_done' or self.flag=='emergency_done' or self.flag=='hospital_done' or self.flag=='disease_done' or self.flag=='weather_done' or self.flag=='location_done' or self.flag=='reminder_done' or self.flag=='morning_concern_done' or self.flag=='noon_concern_done':
             domain = self.choose_domain()
             if domain == 'user':
                 user = User()
                 return user.response()
+            # 決定為emergency的模組流程，可先收集word
+            elif domain == 'emergency':
+                emergency = Emergency(word_domain=self.word_domain, flag='emergency_init')
+                return emergency.response()
             # 決定為hospital的模組流程，可先收集word
             elif domain == 'hospital':
                 hospital = Hospital(word_domain=self.word_domain, flag='hospital_init')
@@ -89,6 +94,9 @@ class Chatbot:
             if 'user' in self.flag:
                 user = User(word_domain=self.word_domain, flag=self.flag)
                 return user.response()
+            elif 'emergency' in self.flag:
+                emergency = Emergency(word_domain=self.word_domain, flag=self.flag)
+                return emergency.response()
             elif 'hospital' in self.flag:
                 hospital = Hospital(word_domain=self.word_domain, flag=self.flag)
                 return hospital.response()
@@ -117,6 +125,7 @@ class Chatbot:
     # 選擇哪個domain模組的回覆流程
     def choose_domain(self):
         isUser = False
+        isEmergency = False
         isHospital = False
         isDisease = False
         isLocation = False
@@ -127,6 +136,8 @@ class Chatbot:
         for data in self.word_domain:
             if data['domain'] == '個人化' or data['domain'] == '性別':
                 isUser = True
+            if data['domain'] == '緊急聯絡人':
+                isEmergency = True
             if data['domain'] == '醫院':
                 isHospital = True
             if data['domain'] == '感冒' or data['domain'] == '慢性病':
@@ -143,6 +154,8 @@ class Chatbot:
 
         if isUser:
             return 'user'
+        elif isEmergency:
+            return 'emergency'
         elif isHospital:
             return 'hospital'
         elif isDisease:

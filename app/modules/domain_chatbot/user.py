@@ -143,7 +143,6 @@ class User:
         logger = log.Logging('user:store_database')
         logger.run(LOG_DIR)
         try:
-            # client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             collect = db['users']
 
@@ -178,6 +177,7 @@ class User:
                     'bmi': self.template['bmi狀況'],
                     'stroke_score': self.template['中風風險']
                 },
+                'emergency_contact': [],
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'conversation':[],
                 'daily_concern': []
@@ -203,7 +203,6 @@ class User:
             print('no user_nickname')
             pass
         else:
-            # client = pymongo.MongoClient(MONGO_URI)
             db = client['aiboxdb']
             collect = db['users']
 

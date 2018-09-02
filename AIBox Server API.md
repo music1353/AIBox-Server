@@ -25,21 +25,22 @@
 
    > 手機端的用戶API，主要提供個人化相關的服務
 
-   | API Method | API URL                            | Desc                                       | Req Params    | Resp Result                                                  |
-   | ---------- | ---------------------------------- | ------------------------------------------ | ------------- | ------------------------------------------------------------ |
-   | POST       | URL/androidUser/login              | 手機端的登入                               | user_nickname |                                                              |
-   | POST       | URL/androidUser/logout             | 手機端的登出                               |               |                                                              |
-   | POST       | URL/androidUser/checkLogin         | 手機端檢查登入狀態                         |               | 正在登入中的user_nickname                                    |
-   | GET        | URL/androidUser/getProfile         | 取得用戶的個人資訊                         |               | nickname, gender, age, height, weight, bmi_value(值), bmi(狀況) |
-   | GET        | URL/androidUser/getHealth          | 取得用戶的生活習慣(健康狀況)               |               | smoking, excercise, heart_problem, stroke, high_blood, high_cholesterol, diabetes, bmi_value, bmi |
-   | GET        | URL/androidUser/getNeed            | 取得用戶需要攝取的水量(c.c.)及卡路里(大卡) |               | needwater, needcarlorie                                      |
-   | GET        | URL/androidUser/getConversation    | 取得用戶的對話紀錄                         |               | [{question, response, date}, ...] *(無資料則回空list)*       |
-   | GET        | URL/androidUser/getRemind          | 取得用戶的提醒資料                         |               | [{remind_time, dosomething}, ...]  *(無資料則回空list)*      |
-   | POST       | URL/androidUser/concernLock        | 讓concern模組知道現在是對誰做關心          | user_nickname |                                                              |
-   | POST       | URL/androidUser/concernRelease     | 讓concern模組知道現在是對誰解除關心狀態    | user_nickname |                                                              |
-   | GET        | URL/androidUser/locationLockStatus | 查看location lock的狀態                    |               | lock_status *(Boolean. True表示使用者詢問了地點資訊)*        |
-   | POST       | URL/androidUser/locationRelease    | 釋放location Lock的狀態                    |               |                                                              |
-   | GET        | URL/androidUser/dailyConcern       | 取得使用者的daily concern資訊              |               | [{date,  diastolic.  systolic}]                              |
+   | API Method | API URL                            | Desc                                       | Req Params          | Resp Result                                                  |
+   | ---------- | ---------------------------------- | ------------------------------------------ | ------------------- | ------------------------------------------------------------ |
+   | POST       | URL/androidUser/login              | 手機端的登入                               | user_nickname       |                                                              |
+   | POST       | URL/androidUser/logout             | 手機端的登出                               |                     |                                                              |
+   | POST       | URL/androidUser/checkLogin         | 手機端檢查登入狀態                         |                     | 正在登入中的user_nickname                                    |
+   | GET        | URL/androidUser/getProfile         | 取得用戶的個人資訊                         |                     | nickname, gender, age, height, weight, bmi_value(值), bmi(狀況) |
+   | GET        | URL/androidUser/getHealth          | 取得用戶的生活習慣(健康狀況)               |                     | smoking, excercise, heart_problem, stroke, high_blood, high_cholesterol, diabetes, bmi_value, bmi |
+   | GET        | URL/androidUser/getNeed            | 取得用戶需要攝取的水量(c.c.)及卡路里(大卡) |                     | needwater, needcarlorie                                      |
+   | GET        | URL/androidUser/getConversation    | 取得用戶的對話紀錄                         |                     | [{question, response, date}, ...] *(無資料則回空list)*       |
+   | GET        | URL/androidUser/getRemind          | 取得用戶的提醒資料                         |                     | [{remind_time, dosomething}, ...]  *(無資料則回空list)*      |
+   | POST       | URL/androidUser/concernLock        | 讓concern模組知道現在是對誰做關心          | user_nickname       |                                                              |
+   | POST       | URL/androidUser/concernRelease     | 讓concern模組知道現在是對誰解除關心狀態    | user_nickname       |                                                              |
+   | GET        | URL/androidUser/locationLockStatus | 查看location lock的狀態                    |                     | lock_status *(Boolean. True表示使用者詢問了地點資訊)*        |
+   | POST       | URL/androidUser/locationRelease    | 釋放location Lock的狀態                    |                     |                                                              |
+   | GET        | URL/androidUser/dailyConcern       | 取得使用者的daily concern資訊              |                     | [{date,  diastolic.  systolic}]                              |
+   | POST       | URL/androidUser/setECP             | 設置緊急聯絡人的名字及電話號碼             | ec_person, ec_phone |                                                              |
 
 2. androidAPI
 
@@ -52,6 +53,7 @@
    | GET        | URL/android/getLastLocation | 取得最後一個(最新)查詢的地點            |                                    | [{location, region, number, unit, date}, ...] *(無資料則回空list)* |
    | GET        | URL/android/getWeather      | 取得某城市的天氣狀況                    | city (e.g. 臺北市、新北市、臺南市) | Wx, MaxT, MinT, CI, PoP, info*(app背景)*                     |
    | GET        | URL/android/getHospital     | 取得醫院的資訊                          | hospital                           | 機構名稱, 拼音機構名稱, 權屬別, 型態別, 縣市鄉鎮, 電話, 地址, 診療科別, 醫院評價, 西醫生, 中醫師, 牙醫師, 藥師, 藥劑生, 護理師, 護士, 助產士, 助產師, 醫事檢驗師, 醫事檢驗生, 物理治療師, 職能治療師, 醫事放射師, 醫事放射士, 物理治療生, 呼吸治療師, 職能治療生, 諮商心理師, 臨床心理師, 營養師, 語言治療師, 牙體技術師, 聽力師, 牙體技術生 |
+   | GET        | URL/android/getECPhone      | 取得緊急聯絡人電話                      |                                    | phone                                                        |
 
    - 詳細資料格式
 

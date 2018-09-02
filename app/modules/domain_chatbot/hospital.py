@@ -39,6 +39,12 @@ class Hospital:
                         self.template['打電話'] = data['word']
                     elif data['domain'] == '非':
                         self.template['不打電話'] = data['word']
+            elif self.flag == 'hospital_address':
+                for data in self.word_domain:
+                    if data['domain'] == '是':
+                        self.template['導航地址'] = data['word']
+                    elif data['domain'] == '非':
+                        self.template['不導航地址'] = data['word']
 
         with open(os.path.join(BASE_DIR, 'domain_chatbot/template/hospital.json'), 'w',encoding='UTF-8') as output:
             json.dump(self.template, output, indent=4, ensure_ascii=False)
@@ -76,6 +82,19 @@ class Hospital:
                     else:
                         response = '{0}的{1}是{2},{3}'.format(self.template['醫院'], self.template['醫院問題'], hospital_doc[self.template['醫院問題']], self.template['電話問題回覆'])
                         flag = 'hospital_phone'
+                # 若是問地址，則問是否需要導航地址
+                elif self.template['醫院問題'] == '地址':
+                    if self.template['導航地址'] != '':
+                        flag = 'hospital_done'
+                        response = self.template['導航地址回覆']
+                        self.clean_template()
+                    elif self.template['不導航地址'] != '':
+                        flag = 'hospital_done'
+                        response = self.template['不導航地址回覆']
+                        self.clean_template()
+                    else:
+                        response = '{0}的{1}是{2},{3}'.format(self.template['醫院'], self.template['醫院問題'], hospital_doc[self.template['醫院問題']], self.template['地址問題回覆'])
+                        flag = 'hospital_address'
                 else:
                     response = '{0}的{1}是{2}'.format(self.template['醫院'], self.template['醫院問題'], hospital_doc[self.template['醫院問題']])
                     flag = 'hospital_done'

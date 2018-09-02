@@ -48,7 +48,7 @@ def android_get_remind():
 
     return jsonify(resp)
 
-@app.route('/api/android/getAllLocation')
+@app.route('/api/android/getAllLocation', methods=['GET'])
 def android_get_all_location():
     '''取得所有查詢的地點
     Returns:
@@ -88,7 +88,7 @@ def android_get_all_location():
     }
     return jsonify(resp)
 
-@app.route('/api/android/getLastLocation')
+@app.route('/api/android/getLastLocation', methods=['GET'])
 def android_get_last_location():
     '''取得最後一個(最新)查詢的地點
     Returns:
@@ -126,7 +126,7 @@ def android_get_last_location():
     }
     return jsonify(resp)
 
-@app.route('/api/android/getWeather')
+@app.route('/api/android/getWeather', methods=['GET'])
 def android_get_weather():
     '''取得某城市的天氣狀況
     Params:
@@ -215,7 +215,7 @@ def android_get_weather():
         }
         return jsonify(resp)
 
-@app.route('/api/android/getHospital')
+@app.route('/api/android/getHospital', methods=['GET'])
 def android_get_hospital():
     '''取得醫院的資訊
     Params:
@@ -247,5 +247,40 @@ def android_get_hospital():
             'status': '404',
             'result': '沒有此醫院',
             'msg': '取得醫院資訊失敗'
+        }
+        return jsonify(resp)
+
+@app.route('/api/android/getECPhone', methods=['GET'])
+def android_get_ec_phone():
+    '''取得緊急聯絡電話
+    Returns:
+        {
+            'status': '200'->取得成功; '404'->取得失敗
+            'result': 取得緊急聯絡電話; 錯誤訊息
+            'msg': 訊息
+        }
+    '''
+
+    db = client['aiboxdb']
+    temp_ec_phone_collect = db['temp_ec_phone']
+    temp_ec_phone_doc = temp_ec_phone_collect.find_one({'_id': 0})
+
+    if temp_ec_phone_doc['phone'] != '':
+        resp = {
+            'status': '200',
+            'result': {
+                'phone': temp_ec_phone_doc['phone']
+            },
+            'msg': '取得緊急聯絡電話成功'
+        }
+
+        temp_ec_phone_doc = temp_ec_phone_collect.find_one_and_update({'_id': 0}, {'$set': {'phone': ''}}, upsert=False)
+
+        return jsonify(resp)
+    else:
+        resp = {
+            'status': '404',
+            'result': "null",
+            'msg': '取得緊急聯絡電話失敗'
         }
         return jsonify(resp)
