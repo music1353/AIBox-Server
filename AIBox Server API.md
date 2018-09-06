@@ -56,6 +56,7 @@
    | GET        | URL/android/getWeather      | 取得某城市的天氣狀況                    | city (e.g. 臺北市、新北市、臺南市) | Wx, MaxT, MinT, CI, PoP, info*(app背景)*                     |
    | GET        | URL/android/getHospital     | 取得醫院的資訊                          | hospital                           | 機構名稱, 拼音機構名稱, 權屬別, 型態別, 縣市鄉鎮, 電話, 地址, 診療科別, 醫院評價, 西醫生, 中醫師, 牙醫師, 藥師, 藥劑生, 護理師, 護士, 助產士, 助產師, 醫事檢驗師, 醫事檢驗生, 物理治療師, 職能治療師, 醫事放射師, 醫事放射士, 物理治療生, 呼吸治療師, 職能治療生, 諮商心理師, 臨床心理師, 營養師, 語言治療師, 牙體技術師, 聽力師, 牙體技術生 |
    | GET        | URL/android/getECPhone      | 取得緊急聯絡人電話                      |                                    | phone                                                        |
+   | GET        | URL/android/getActivity     | 取得活動資訊                            |                                    | title, disc, latitude, longitude                             |
 
    - 詳細資料格式
 
