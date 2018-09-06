@@ -171,7 +171,6 @@ def android_get_weather():
     resp = requests.get('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=rdec-key-123-45678-011121314')
     data = json.loads(resp.text)
     records = data['records']['location'] # 各地區的預報紀錄
-    print(records[0]['weatherElement'][0]['time'][-1]['parameter']['parameterName'])
 
     for record in records:
         if record['locationName'] == city:
@@ -284,3 +283,25 @@ def android_get_ec_phone():
             'msg': '取得緊急聯絡電話失敗'
         }
         return jsonify(resp)
+
+@app.route('/api/android/getActivity', methods=['GET'])
+def android_get_activity():
+    '''取得活動資訊
+    Returns:
+        {
+            'status': '200'->取得成功; '404'->取得失敗
+            'result': 取得活動資訊; 錯誤訊息
+            'msg': 訊息
+        }
+    '''
+
+    db = client['aiboxdb']
+    open_activity_collect = db['open_activity']
+    open_activity_doc = open_activity_collect.find({}, {'_id': False})
+
+    resp = {
+        'status': '200',
+        'result': list(open_activity_doc),
+        'msg': '取得活動資訊成功'
+    }
+    return jsonify(resp)

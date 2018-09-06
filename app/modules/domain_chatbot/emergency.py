@@ -56,7 +56,7 @@ class Emergency:
                 user_doc = user_collect.find_one({'nickname': user_nickname})
                 
                 for item in user_doc['emergency_contact']:
-                    if self.template['緊急聯絡人拼音'] in item['person']:
+                    if self.template['緊急聯絡人拼音'] in item['person_pinyin']:
                         self.template['電話'] = item['phone']
 
                 content['flag'] = 'emergency_done'

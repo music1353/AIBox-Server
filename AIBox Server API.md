@@ -41,6 +41,8 @@
    | POST       | URL/androidUser/locationRelease    | 釋放location Lock的狀態                    |                     |                                                              |
    | GET        | URL/androidUser/dailyConcern       | 取得使用者的daily concern資訊              |                     | [{date,  diastolic.  systolic}]                              |
    | POST       | URL/androidUser/setECP             | 設置緊急聯絡人的名字及電話號碼             | ec_person, ec_phone |                                                              |
+   | GET        | URL/androidUser/getECP             | 取得使用者的ECP                            |                     |                                                              |
+   | POST       | URL/androidUser/deleteECP          | 刪除使用者的緊急聯絡人                     | ec_person           |                                                              |
 
 2. androidAPI
 

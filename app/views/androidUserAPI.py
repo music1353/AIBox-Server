@@ -8,6 +8,8 @@ from app.modules.pinyin_compare import pinyin
 from datetime import datetime, timedelta
 import os
 import json
+import traceback
+from app.modules.pinyin_compare import pinyin
 
 # 連進MongoDB
 db = client['aiboxdb']
@@ -284,12 +286,13 @@ def androidUser_get_remind():
 
     result_list = []
     for item in user_remind_doc:
-        if datetime.strptime(item['remind_time'], '%Y-%m-%d %H:%M:%S') > datetime.today():
-            obj = {
-                'remind_time': item['remind_time'],
-                'dosomething': item['dosomething']
-            }
-            result_list.append(obj)
+        # if datetime.strptime(item['remind_time'], '%Y-%m-%d %H:%M:%S') > datetime.today():
+        # 180905, 去除日期篩選    
+        obj = {
+            'remind_time': item['remind_time'],
+            'dosomething': item['dosomething']
+        }
+        result_list.append(obj)
 
     resp = {
         'status': '200',
@@ -474,25 +477,33 @@ def set_ECP():
         return jsonify(resp)
 
     contact_info = {
-        'person': pinyin.to_pinyin(ec_person),
+        'person': ec_person,
+        'person_pinyin': pinyin.to_pinyin(ec_person),
         'phone': ec_phone,
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
     try:
         # 加進mydict
-        with open(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'), 'a+') as f:
-            f.write('\n')
-            f.write(ec_person+" 100000 N")
+        with open(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'), 'r', encoding='UTF-8') as f:
+            lines = f.readlines()
+        with open(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'), 'w', encoding='UTF-8') as f:
+            for l in lines:
+                l = l.strip()
+                if l == '\n' or len(l) == 0 or l == '':
+                    continue
+                f.write(l)
+                f.write('\n')
+            f.write(ec_person+" 999999 N")
         jieba_tw.set_dictionary(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'))
 
         # 加進domain
-        with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'r') as f:
+        with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'r', encoding='UTF-8') as f:
             ec_file = json.load(f)
             ec_file['concepts'].append(ec_person)
             ec_file['pinyin_concepts'].append(pinyin.to_pinyin(ec_person))
 
-            with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'w') as output:
+            with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'w', encoding='UTF-8') as output:
                 output.write(json.dumps(ec_file, ensure_ascii=False))
 
         # 存進db
@@ -505,10 +516,129 @@ def set_ECP():
         }
         return jsonify(resp)
     except:
+        traceback.print_exc()
         resp = {
             'status': '404',
             'result': '設置緊急聯絡人錯誤',
             'msg': '新增至資料庫錯誤'
+        }
+        return jsonify(resp)
+
+
+@app.route('/api/androidUser/getECP', methods=['GET'])
+def androidUser_get_ECP():
+    '''取得使用者的ECP資訊
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': 使用者的ECP訊息
+            'msg': 訊息
+        }
+    '''
+
+    if (session.get('user_nickname') is not None):
+        user_nickname = session.get('user_nickname')
+        collect = db['users']
+        user_doc = collect.find_one({'nickname': user_nickname})
+    else:
+        resp = {
+            'status': '404',
+            'result': '未登入',
+            'msg': '取得用戶ECP錯誤'
+        }
+        return jsonify(resp)
+
+    ECP_data_list = user_doc['emergency_contact']
+
+    resp = {
+        'status': '200',
+        'result': ECP_data_list,
+        'msg': '取得ECP成功'
+    }
+    return jsonify(resp)
+
+@app.route('/api/androidUser/deleteECP', methods=['POST'])
+def delete_ECP():
+    '''刪除使用者的緊急聯絡人
+    Params:
+        ec_person: 緊急聯絡人的名字
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': 設置是否成功
+            'msg': 訊息
+        }
+    '''
+
+    ec_person = request.json['ec_person']
+
+    if(session.get('user_nickname') is not None):
+        user_nickname = session.get('user_nickname')
+        collect = db['users']
+    else:
+        resp = {
+            'status': '404',
+            'result': '未登入',
+            'msg': '設置緊急聯絡人錯誤'
+        }
+        return jsonify(resp)
+
+    try:
+        # 刪除mydict
+        with open(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'), 'r', encoding='UTF-8') as f:
+            lines = f.readlines()
+        with open(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'), 'w', encoding='UTF-8') as f:
+            for l in lines:
+                l = l.strip()
+                if ec_person in l or l == '\n' or len(l) == 0 or l == '':
+                    continue
+                f.write(l)
+                f.write('\n')
+        jieba_tw.set_dictionary(os.path.join(BASE_DIR, 'domain_matcher/jieba_dict/mydict.txt'))
+
+        # 刪除domain包含的ec_person
+        with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'r', encoding='UTF-8') as f:
+            ec_file = json.load(f)
+            concept_list = list(ec_file['concepts'])
+            pinyin_concepts_list = list(ec_file['pinyin_concepts'])
+
+            for concept in concept_list:
+                if concept == ec_person:
+                    concept_list.remove(ec_person)
+                    break
+            ec_file['concepts'] = concept_list
+            for pinyin_concept in pinyin_concepts_list:
+                if pinyin.compare_with_pinyin(ec_person, pinyin_concept):
+                    pinyin_concepts_list.remove(pinyin_concept)
+                    break
+            ec_file['pinyin_concepts'] = pinyin_concepts_list
+
+        with open(os.path.join(BASE_DIR, 'domain_matcher/custom/ec_person.json'), 'w', encoding='UTF-8') as output:
+            output.write(json.dumps(ec_file, ensure_ascii=False))
+
+        # 刪除db的ec_person
+        user_doc = collect.find_one({'nickname': user_nickname})
+        emergency_contact_doc = user_doc['emergency_contact']
+
+        temp_list = []
+        for emergency_contact in emergency_contact_doc:
+            if emergency_contact['person'] != ec_person:
+                temp_list.append(emergency_contact)
+        user_doc['emergency_contact'] = temp_list
+        collect.save(user_doc)
+
+        resp = {
+            'status': '200',
+            'result': '刪除緊急聯絡人成功',
+            'msg': ''
+        }
+        return jsonify(resp)
+    except:
+        traceback.print_exc()
+        resp = {
+            'status': '404',
+            'result': '刪除緊急聯絡人錯誤',
+            'msg': '刪除資料庫之資料錯誤'
         }
         return jsonify(resp)
     
