@@ -297,11 +297,20 @@ def android_get_activity():
 
     db = client['aiboxdb']
     open_activity_collect = db['open_activity']
-    open_activity_doc = open_activity_collect.find({}, {'_id': False})
+    # open_activity_doc = open_activity_collect.find({}, {'_id': False})
+    open_activity_doc = open_activity_collect.find({})
+    open_activity_list = list(open_activity_doc)
 
+    # 過濾過期的活動
+    result_ativtiy_list = []
+    for item in open_activity_list:
+        if datetime.strptime(item['startDate'], '%Y/%m/%d') > datetime.today():
+            item.pop('_id')
+            result_ativtiy_list.append(item)
+    
     resp = {
         'status': '200',
-        'result': list(open_activity_doc),
+        'result': result_ativtiy_list,
         'msg': '取得活動資訊成功'
     }
     return jsonify(resp)
