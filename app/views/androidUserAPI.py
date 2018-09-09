@@ -641,6 +641,51 @@ def delete_ECP():
             'msg': '刪除資料庫之資料錯誤'
         }
         return jsonify(resp)
+
+@app.route('/api/androidUser/addRemind', methods=['POST'])
+def add_remind():
+    '''新增使用者的提醒事件
+    Params:
+        time: 事件日期
+        dosomething: 事件內容
+        date: 新增日期
+    Returns:
+        {
+            'status': '200'->成功; '404'->失敗
+            'result': 新增事件是否成功
+            'msg': 訊息
+        }
+    '''
+
+    remind_time = request.json['remind_time']
+    dosomething = request.json['dosomething']
+    date = request.json['date']
+
+    if(session.get('user_nickname') is not None):
+        user_nickname = session.get('user_nickname')
+        remind_collect = db['reminder']
+        new_user_remind_doc = {
+            'user_nickname': user_nickname,
+            'remind_time': remind_time,
+            'dosomething': user_nickname + "，您該" + dosomething,
+            'date': date
+        }
+        remind_collect.insert_one(new_user_remind_doc)
+
+        resp = {
+            'status': '200',
+            'result': '新增提醒事件成功',
+            'msg': '刪除提醒事件成功'
+        }
+        return jsonify(resp)
+
+    else:
+        resp = {
+            'status': '404',
+            'result': '未登入',
+            'msg': '設置緊急聯絡人錯誤'
+        }
+        return jsonify(resp)
     
     
 
