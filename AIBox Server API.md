@@ -25,24 +25,25 @@
 
    > 手機端的用戶API，主要提供個人化相關的服務
 
-   | API Method | API URL                            | Desc                                       | Req Params          | Resp Result                                                  |
-   | ---------- | ---------------------------------- | ------------------------------------------ | ------------------- | ------------------------------------------------------------ |
-   | POST       | URL/androidUser/login              | 手機端的登入                               | user_nickname       |                                                              |
-   | POST       | URL/androidUser/logout             | 手機端的登出                               |                     |                                                              |
-   | POST       | URL/androidUser/checkLogin         | 手機端檢查登入狀態                         |                     | 正在登入中的user_nickname                                    |
-   | GET        | URL/androidUser/getProfile         | 取得用戶的個人資訊                         |                     | nickname, gender, age, height, weight, bmi_value(值), bmi(狀況) |
-   | GET        | URL/androidUser/getHealth          | 取得用戶的生活習慣(健康狀況)               |                     | smoking, excercise, heart_problem, stroke, high_blood, high_cholesterol, diabetes, bmi_value, bmi |
-   | GET        | URL/androidUser/getNeed            | 取得用戶需要攝取的水量(c.c.)及卡路里(大卡) |                     | needwater, needcarlorie                                      |
-   | GET        | URL/androidUser/getConversation    | 取得用戶的對話紀錄                         |                     | [{question, response, date}, ...] *(無資料則回空list)*       |
-   | GET        | URL/androidUser/getRemind          | 取得用戶的提醒資料                         |                     | [{remind_time, dosomething}, ...]  *(無資料則回空list)*      |
-   | POST       | URL/androidUser/concernLock        | 讓concern模組知道現在是對誰做關心          | user_nickname       |                                                              |
-   | POST       | URL/androidUser/concernRelease     | 讓concern模組知道現在是對誰解除關心狀態    | user_nickname       |                                                              |
-   | GET        | URL/androidUser/locationLockStatus | 查看location lock的狀態                    |                     | lock_status *(Boolean. True表示使用者詢問了地點資訊)*        |
-   | POST       | URL/androidUser/locationRelease    | 釋放location Lock的狀態                    |                     |                                                              |
-   | GET        | URL/androidUser/dailyConcern       | 取得使用者的daily concern資訊              |                     | [{date,  diastolic.  systolic}]                              |
-   | POST       | URL/androidUser/setECP             | 設置緊急聯絡人的名字及電話號碼             | ec_person, ec_phone |                                                              |
-   | GET        | URL/androidUser/getECP             | 取得使用者的ECP                            |                     |                                                              |
-   | POST       | URL/androidUser/deleteECP          | 刪除使用者的緊急聯絡人                     | ec_person           |                                                              |
+   | API Method | API URL                            | Desc                                       | Req Params              | Resp Result                                                  |
+   | ---------- | ---------------------------------- | ------------------------------------------ | ----------------------- | ------------------------------------------------------------ |
+   | POST       | URL/androidUser/login              | 手機端的登入                               | user_nickname           |                                                              |
+   | POST       | URL/androidUser/logout             | 手機端的登出                               |                         |                                                              |
+   | POST       | URL/androidUser/checkLogin         | 手機端檢查登入狀態                         |                         | 正在登入中的user_nickname                                    |
+   | GET        | URL/androidUser/getProfile         | 取得用戶的個人資訊                         |                         | nickname, gender, age, height, weight, bmi_value(值), bmi(狀況) |
+   | GET        | URL/androidUser/getHealth          | 取得用戶的生活習慣(健康狀況)               |                         | smoking, excercise, heart_problem, stroke, high_blood, high_cholesterol, diabetes, bmi_value, bmi |
+   | GET        | URL/androidUser/getNeed            | 取得用戶需要攝取的水量(c.c.)及卡路里(大卡) |                         | needwater, needcarlorie                                      |
+   | GET        | URL/androidUser/getConversation    | 取得用戶的對話紀錄                         |                         | [{question, response, date}, ...] *(無資料則回空list)*       |
+   | GET        | URL/androidUser/getRemind          | 取得用戶的提醒資料                         |                         | [{remind_time, dosomething}, ...]  *(無資料則回空list)*      |
+   | POST       | URL/androidUser/concernLock        | 讓concern模組知道現在是對誰做關心          | user_nickname           |                                                              |
+   | POST       | URL/androidUser/concernRelease     | 讓concern模組知道現在是對誰解除關心狀態    | user_nickname           |                                                              |
+   | GET        | URL/androidUser/locationLockStatus | 查看location lock的狀態                    |                         | lock_status *(Boolean. True表示使用者詢問了地點資訊)*        |
+   | POST       | URL/androidUser/locationRelease    | 釋放location Lock的狀態                    |                         |                                                              |
+   | GET        | URL/androidUser/dailyConcern       | 取得使用者的daily concern資訊              |                         | [{date,  diastolic.  systolic}]                              |
+   | POST       | URL/androidUser/setECP             | 設置緊急聯絡人的名字及電話號碼             | ec_person, ec_phone     |                                                              |
+   | GET        | URL/androidUser/getECP             | 取得使用者的ECP                            |                         |                                                              |
+   | POST       | URL/androidUser/deleteECP          | 刪除使用者的緊急聯絡人                     | ec_person               |                                                              |
+   | POST       | URL/androidUser/addRemind          | 新增使用者的提醒事件                       | time, dosomething, date |                                                              |
 
 2. androidAPI
 
